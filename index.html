@@ -104,18 +104,21 @@
     <section id="admin-panel" style="display:none;">
       <h2>Admin Panel</h2>
 
+      <!-- Client Selector -->
       <label for="clientSelect">Select Client:</label>
       <select id="clientSelect">
         <option disabled selected>Choose a client</option>
       </select>
       <hr>
 
+      <!-- Workout Plan Editor -->
       <h3>Workout Plan</h3>
       <div id="workoutEditor">
         <button id="addWorkoutBtn">+ Add Exercise</button>
       </div>
       <hr>
 
+      <!-- Nutrition Plan Editor -->
       <h3>Nutrition Plan</h3>
       <div id="mealEditor">
         <h4>Meals</h4>
@@ -128,6 +131,7 @@
       </div>
       <hr>
 
+      <!-- Notes -->
       <h3>Trainer Notes to Client</h3>
       <textarea id="trainerNote" placeholder="Enter message for client..."></textarea>
 
@@ -135,10 +139,99 @@
       <div id="clientNotesOutput">Loading client notes...</div>
       <hr>
 
+      <!-- Admin Actions -->
       <button id="previewBtn">🔍 Preview Client Dashboard</button>
       <button id="clearBtn">🧹 Clear Plan</button>
       <button id="undoBtn">↩️ Undo Last Change</button>
     </section>
   </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBWzRFnpvX10kF7eCBezX3vY9MBVXlpV6g",
+      authDomain: "mytrainingapp-3a352.firebaseapp.com",
+      projectId: "mytrainingapp-3a352",
+      storageBucket: "mytrainingapp-3a352.firebasestorage.app",
+      messagingSenderId: "802120004680",
+      appId: "1:802120004680:web:ac9496211c8d3de7f9147d",
+      measurementId: "G-PZZJ4EFED4"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // UI elements
+    const loginDiv = document.getElementById('login');
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content');
+    const clientNameSpan = document.getElementById('clientName');
+    const signInBtn = document.getElementById('signInBtn');
+    const signUpBtn = document.getElementById('signUpBtn');
+    const signOutLink = document.getElementById('signOutLink');
+    const adminPanelLink = document.getElementById('adminPanelLink');
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        const userEmail = user.email;
+        loginDiv.style.display = 'none';
+        sidebar.style.display = 'block';
+        mainContent.style.display = 'block';
+        clientNameSpan.textContent = userEmail.split('@')[0];
+
+        // Show admin panel for admin email
+        if (userEmail === 'jeremyevega@icloud.com') {
+          adminPanelLink.style.display = 'block';
+          document.getElementById('admin-panel').style.display = 'block';
+        }
+      } else {
+        loginDiv.style.display = 'block';
+        sidebar.style.display = 'none';
+        mainContent.style.display = 'none';
+      }
+    });
+
+    // Sign In
+    signInBtn.addEventListener('click', () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      auth.signInWithEmailAndPassword(email, password)
+        .catch(error => alert(error.message));
+    });
+
+    // Sign Up
+    signUpBtn.addEventListener('click', () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      auth.createUserWithEmailAndPassword(email, password)
+        .catch(error => alert(error.message));
+    });
+
+    // Sign Out
+    signOutLink.addEventListener('click', e => {
+      e.preventDefault();
+      auth.signOut();
+    });
+
+    // Basic navigation switching
+    document.querySelectorAll('nav ul li a').forEach(link => {
+      if (link.id === 'signOutLink') return;
+      if (link.id === 'adminPanelLink') {
+        link.addEventListener('click', e => {
+          e.preventDefault();
+          document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
+          document.getElementById('admin-panel').style.display = 'block';
+        });
+      } else {
+        link.addEventListener('click', e => {
+          e.preventDefault();
+          document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
+          const targetId = link.getAttribute('href').substring(1);
+          document.getElementById(targetId).style.display = 'block';
+        });
+      }
+    });
+  </script>
 </body>
 </html>
