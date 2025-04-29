@@ -185,8 +185,8 @@
       const password = document.getElementById('password').value;
       auth.signInWithEmailAndPassword(email, password).catch(err => alert(err.message));
     });
-
-    signUpBtn.addEventListener('click', () => {
+    
+signUpBtn.addEventListener('click', () => {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
 
@@ -194,13 +194,30 @@
     .then(cred => {
       return db.collection('clients').doc(cred.user.uid).set({
         email: cred.user.email,
-        meals: [],
-        workout: [],
-        trainerNote: ""
+        meals: [
+          {
+            name: "Oats and Protein Shake",
+            calories: 350,
+            protein: 30,
+            carbs: 40,
+            fats: 8
+          }
+        ],
+        workout: [
+          {
+            name: "Push-ups",
+            setsReps: "3x15",
+            weight: "Bodyweight",
+            rest: "60 sec",
+            link: "https://www.youtube.com/watch?v=_l3ySVKYVJ8"
+          }
+        ],
+        trainerNote: "Welcome to your program! Let’s get to work!"
       });
     })
     .catch(err => alert(err.message));
 });
+
 
     signOutLink.addEventListener('click', e => {
       e.preventDefault();
