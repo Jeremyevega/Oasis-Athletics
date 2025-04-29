@@ -33,52 +33,73 @@
       appId: "1:802120004680:web:ac9496211c8d3de7f9147d"
     };
     firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
     window.onload = function () {
       const params = new URLSearchParams(window.location.search);
       const clientId = params.get('id');
+      console.log("Client ID from URL:", clientId);
 
       if (!clientId) {
-        document.body.innerHTML = '<p style="color:red;">No client ID provided.</p>';
+        document.body.innerHTML = '<p style="color:red;">No client ID provided in URL.</p>';
         return;
       }
 
-      firebase.firestore().collection('clients').doc(clientId).get().then(doc => {
+      db.collection('clients').doc(clientId).get().then(doc => {
         if (!doc.exists) {
-          document.body.innerHTML = '<p style="color:red;">Client not found.</p>';
+          document.body.innerHTML = '<p style="color:red;">Client not found in Firestore.</p>';
           return;
         }
 
         const data = doc.data();
-        const workout = data.workout || [];
-        const meals = data.meals || [];
-        const trainerNote = data.trainerNote || '';
+        console.log("Client data:", data);
 
+        // Trainer note
+        const note = data.trainerNote || "No trainer note.";
+        document.getElementById('trainerNoteText').textContent = note;
+
+        // Workout
+        const workout = data.workout || [];
         const workoutDiv = document.getElementById('previewWorkout');
         workoutDiv.innerHTML = '';
-        workout.forEach(ex => {
-          const el = document.createElement('div');
-          el.innerHTML = `<p><strong>${ex.name}</strong><br>Sets/Reps: ${ex.setsReps}<br>Weight: ${ex.weight}<br>Rest: ${ex.rest}<br><a href="${ex.link}" target="_blank">Video</a></p><hr>`;
-          workoutDiv.appendChild(el);
-        });
 
-        let totalCals = 0, totalProtein = 0, totalCarbs = 0, totalFats = 0;
+        if (workout.length === 0) {
+          workoutDiv.textContent = 'No workout data available.';
+        } else {
+          workout.forEach(ex => {
+            const el = document.createElement('div');
+            el.innerHTML = `<p><strong>${ex.name}</strong><br>Sets/Reps: ${ex.setsReps}<br>Weight: ${ex.weight}<br>Rest: ${ex.rest}<br><a href="${ex.link}" target="_blank">Video</a></p><hr>`;
+            workoutDiv.appendChild(el);
+          });
+        }
+
+        // Meals
+        const meals = data.meals || [];
         const mealDiv = document.getElementById('previewMeals');
         mealDiv.innerHTML = '';
-        meals.forEach(meal => {
-          totalCals += meal.calories || 0;
-          totalProtein += meal.protein || 0;
-          totalCarbs += meal.carbs || 0;
-          totalFats += meal.fats || 0;
-          const el = document.createElement('div');
-          el.innerHTML = `<p><strong>${meal.name}</strong><br>Calories: ${meal.calories} | Protein: ${meal.protein}g | Carbs: ${meal.carbs}g | Fats: ${meal.fats}g</p><hr>`;
-          mealDiv.appendChild(el);
-        });
+
+        let totalCals = 0, totalProtein = 0, totalCarbs = 0, totalFats = 0;
+
+        if (meals.length === 0) {
+          mealDiv.textContent = 'No meal data available.';
+        } else {
+          meals.forEach(meal => {
+            totalCals += meal.calories || 0;
+            totalProtein += meal.protein || 0;
+            totalCarbs += meal.carbs || 0;
+            totalFats += meal.fats || 0;
+            const el = document.createElement('div');
+            el.innerHTML = `<p><strong>${meal.name}</strong><br>Calories: ${meal.calories} | Protein: ${meal.protein}g | Carbs: ${meal.carbs}g | Fats: ${meal.fats}g</p><hr>`;
+            mealDiv.appendChild(el);
+          });
+        }
 
         document.getElementById('macroTotals').textContent = 
           `Total: ${totalCals} kcal | Protein: ${totalProtein}g | Carbs: ${totalCarbs}g | Fats: ${totalFats}g`;
 
-        document.getElementById('trainerNoteText').textContent = trainerNote;
+      }).catch(error => {
+        console.error("Error getting document:", error);
+        document.body.innerHTML = `<p style='color:red;'>Error loading data: ${error.message}</p>`;
       });
     };
   </script>
