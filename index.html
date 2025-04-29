@@ -145,8 +145,6 @@
     const adminPanelLink = document.getElementById('adminPanelLink');
     const clientSelect = document.getElementById('clientSelect');
 
-    let lastSavedState = {};
-
     auth.onAuthStateChanged(user => {
       if (user) {
         const userEmail = user.email;
@@ -155,11 +153,9 @@
         mainContent.style.display = 'block';
         clientNameSpan.textContent = userEmail.split('@')[0];
 
-        // Hide admin panel by default
         adminPanelLink.style.display = 'none';
         document.getElementById('admin-panel').style.display = 'none';
 
-        // Show admin panel only for specific email
         if (userEmail === 'jeremyevega@icloud.com') {
           adminPanelLink.style.display = 'block';
           document.getElementById('admin-panel').style.display = 'block';
@@ -185,39 +181,37 @@
       const password = document.getElementById('password').value;
       auth.signInWithEmailAndPassword(email, password).catch(err => alert(err.message));
     });
-    
-signUpBtn.addEventListener('click', () => {
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
 
-  auth.createUserWithEmailAndPassword(email, password)
-    .then(cred => {
-      return db.collection('clients').doc(cred.user.uid).set({
-        email: cred.user.email,
-        meals: [
-          {
-            name: "Oats and Protein Shake",
-            calories: 350,
-            protein: 30,
-            carbs: 40,
-            fats: 8
-          }
-        ],
-        workout: [
-          {
-            name: "Push-ups",
-            setsReps: "3x15",
-            weight: "Bodyweight",
-            rest: "60 sec",
-            link: "https://www.youtube.com/watch?v=_l3ySVKYVJ8"
-          }
-        ],
-        trainerNote: "Welcome to your program! Let’s get to work!"
-      });
-    })
-    .catch(err => alert(err.message));
-});
-
+    signUpBtn.addEventListener('click', () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(cred => {
+          return db.collection('clients').doc(cred.user.uid).set({
+            email: cred.user.email,
+            meals: [
+              {
+                name: "Oats and Protein Shake",
+                calories: 350,
+                protein: 30,
+                carbs: 40,
+                fats: 8
+              }
+            ],
+            workout: [
+              {
+                name: "Push-ups",
+                setsReps: "3x15",
+                weight: "Bodyweight",
+                rest: "60 sec",
+                link: "https://www.youtube.com/watch?v=_l3ySVKYVJ8"
+              }
+            ],
+            trainerNote: "Welcome to your program! Let’s get to work!"
+          });
+        })
+        .catch(err => alert(err.message));
+    });
 
     signOutLink.addEventListener('click', e => {
       e.preventDefault();
@@ -241,5 +235,4 @@ signUpBtn.addEventListener('click', () => {
     });
   </script>
 </body>
-</html> 
- 
+</html>
