@@ -13,14 +13,14 @@
   <div class="main-content">
     <h1>Client Dashboard Preview</h1>
     <h2>Workout Plan</h2>
-    <div id="previewWorkout"></div>
+    <div id="previewWorkout">Loading workout...</div>
 
     <h2>Nutrition Plan</h2>
-    <div id="previewMeals"></div>
-    <p id="macroTotals"></p>
+    <div id="previewMeals">Loading meals...</div>
+    <p id="macroTotals">Loading macros...</p>
 
     <h2>Trainer Notes</h2>
-    <p id="trainerNoteText"></p>
+    <p id="trainerNoteText">Loading notes...</p>
   </div>
 
   <script>
@@ -35,10 +35,6 @@
     firebase.initializeApp(firebaseConfig);
 
     window.onload = function () {
-      document.getElementById('previewWorkout').innerHTML = 'Loading workout...';
-document.getElementById('previewMeals').innerHTML = 'Loading meals...';
-document.getElementById('macroTotals').innerHTML = 'Loading macros...';
-document.getElementById('trainerNoteText').innerHTML = 'Loading notes...';
       const params = new URLSearchParams(window.location.search);
       const clientId = params.get('id');
 
@@ -59,6 +55,7 @@ document.getElementById('trainerNoteText').innerHTML = 'Loading notes...';
         const trainerNote = data.trainerNote || '';
 
         const workoutDiv = document.getElementById('previewWorkout');
+        workoutDiv.innerHTML = '';
         workout.forEach(ex => {
           const el = document.createElement('div');
           el.innerHTML = `<p><strong>${ex.name}</strong><br>Sets/Reps: ${ex.setsReps}<br>Weight: ${ex.weight}<br>Rest: ${ex.rest}<br><a href="${ex.link}" target="_blank">Video</a></p><hr>`;
@@ -67,6 +64,7 @@ document.getElementById('trainerNoteText').innerHTML = 'Loading notes...';
 
         let totalCals = 0, totalProtein = 0, totalCarbs = 0, totalFats = 0;
         const mealDiv = document.getElementById('previewMeals');
+        mealDiv.innerHTML = '';
         meals.forEach(meal => {
           totalCals += meal.calories || 0;
           totalProtein += meal.protein || 0;
