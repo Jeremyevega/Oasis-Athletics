@@ -35,6 +35,10 @@
     firebase.initializeApp(firebaseConfig);
 
     window.onload = function () {
+      document.getElementById('previewWorkout').innerHTML = 'Loading workout...';
+document.getElementById('previewMeals').innerHTML = 'Loading meals...';
+document.getElementById('macroTotals').innerHTML = 'Loading macros...';
+document.getElementById('trainerNoteText').innerHTML = 'Loading notes...';
       const params = new URLSearchParams(window.location.search);
       const clientId = params.get('id');
 
