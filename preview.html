@@ -33,28 +33,27 @@
       appId: "1:802120004680:web:ac9496211c8d3de7f9147d"
     };
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
 
-    // Get ?id=CLIENT_ID from URL
-    const params = new URLSearchParams(window.location.search);
-    const clientId = params.get('id');
+    window.onload = function () {
+      const params = new URLSearchParams(window.location.search);
+      const clientId = params.get('id');
 
-    if (!clientId) {
-      document.body.innerHTML = '<p style="color:red;">No client ID provided.</p>';
-    } else {
-      db.collection('clients').doc(clientId).get().then(doc => {
+      if (!clientId) {
+        document.body.innerHTML = '<p style="color:red;">No client ID provided.</p>';
+        return;
+      }
+
+      firebase.firestore().collection('clients').doc(clientId).get().then(doc => {
         if (!doc.exists) {
           document.body.innerHTML = '<p style="color:red;">Client not found.</p>';
           return;
         }
 
         const data = doc.data();
-
         const workout = data.workout || [];
         const meals = data.meals || [];
         const trainerNote = data.trainerNote || '';
 
-        // Show workouts
         const workoutDiv = document.getElementById('previewWorkout');
         workout.forEach(ex => {
           const el = document.createElement('div');
@@ -62,7 +61,6 @@
           workoutDiv.appendChild(el);
         });
 
-        // Show meals
         let totalCals = 0, totalProtein = 0, totalCarbs = 0, totalFats = 0;
         const mealDiv = document.getElementById('previewMeals');
         meals.forEach(meal => {
@@ -74,12 +72,13 @@
           el.innerHTML = `<p><strong>${meal.name}</strong><br>Calories: ${meal.calories} | Protein: ${meal.protein}g | Carbs: ${meal.carbs}g | Fats: ${meal.fats}g</p><hr>`;
           mealDiv.appendChild(el);
         });
-        document.getElementById('macroTotals').textContent = `Total: ${totalCals} kcal | Protein: ${totalProtein}g | Carbs: ${totalCarbs}g | Fats: ${totalFats}g`;
 
-        // Show trainer note
+        document.getElementById('macroTotals').textContent = 
+          `Total: ${totalCals} kcal | Protein: ${totalProtein}g | Carbs: ${totalCarbs}g | Fats: ${totalFats}g`;
+
         document.getElementById('trainerNoteText').textContent = trainerNote;
       });
-    }
+    };
   </script>
 </body>
 </html>
