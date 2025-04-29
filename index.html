@@ -347,6 +347,11 @@
     document.getElementById('previewBtn').addEventListener('click', () => {
       alert('Preview feature coming soon!');
     });
+     document.getElementById('previewBtn').addEventListener('click', () => {
+    const clientId = clientSelect.value;
+    if (!clientId) return alert('Please select a client first.');
+    window.open(`preview.html?id=${clientId}`, '_blank');
+  });
   </script>
 </body>
 </html>
