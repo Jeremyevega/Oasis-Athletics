@@ -14,15 +14,7 @@
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
-  </style>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -46,6 +38,7 @@
         <li><a href="#progress">Progress Tracking</a></li>
         <li><a href="#notes">Notes</a></li>
         <li><a href="#contact">Contact</a></li>
+        <li><a href="#admin-panel" id="adminPanelLink" style="display:none;">Admin Panel</a></li>
         <li><a href="#" id="signOutLink">Logout</a></li>
       </ul>
     </nav>
@@ -106,73 +99,46 @@
         <button type="submit">Send Message</button>
       </form>
     </section>
+
+    <!-- ADMIN PANEL (only for jeremyevega@icloud.com) -->
+    <section id="admin-panel" style="display:none;">
+      <h2>Admin Panel</h2>
+
+      <label for="clientSelect">Select Client:</label>
+      <select id="clientSelect">
+        <option disabled selected>Choose a client</option>
+      </select>
+      <hr>
+
+      <h3>Workout Plan</h3>
+      <div id="workoutEditor">
+        <button id="addWorkoutBtn">+ Add Exercise</button>
+      </div>
+      <hr>
+
+      <h3>Nutrition Plan</h3>
+      <div id="mealEditor">
+        <h4>Meals</h4>
+        <div id="mealsList"></div>
+        <button id="addMealBtn">+ Add Meal</button>
+        <div style="margin-top: 10px;">
+          <strong>Total for Day:</strong>
+          <p id="dailyTotal">Calories: 0 | Protein: 0g | Carbs: 0g | Fats: 0g</p>
+        </div>
+      </div>
+      <hr>
+
+      <h3>Trainer Notes to Client</h3>
+      <textarea id="trainerNote" placeholder="Enter message for client..."></textarea>
+
+      <h3>Client Notes to Trainer</h3>
+      <div id="clientNotesOutput">Loading client notes...</div>
+      <hr>
+
+      <button id="previewBtn">🔍 Preview Client Dashboard</button>
+      <button id="clearBtn">🧹 Clear Plan</button>
+      <button id="undoBtn">↩️ Undo Last Change</button>
+    </section>
   </div>
-
-  <!-- JavaScript -->
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBWzRFnpvX10kF7eCBezX3vY9MBVXlpV6g",
-      authDomain: "mytrainingapp-3a352.firebaseapp.com",
-      projectId: "mytrainingapp-3a352",
-      storageBucket: "mytrainingapp-3a352.firebasestorage.app",
-      messagingSenderId: "802120004680",
-      appId: "1:802120004680:web:ac9496211c8d3de7f9147d",
-      measurementId: "G-PZZJ4EFED4"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-
-    const loginDiv = document.getElementById('login');
-    const sidebar = document.querySelector('.sidebar');
-    const mainContent = document.querySelector('.main-content');
-    const clientNameSpan = document.getElementById('clientName');
-    const signInBtn = document.getElementById('signInBtn');
-    const signUpBtn = document.getElementById('signUpBtn');
-    const signOutLink = document.getElementById('signOutLink');
-
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        loginDiv.style.display = 'none';
-        sidebar.style.display = 'block';
-        mainContent.style.display = 'block';
-        clientNameSpan.textContent = user.email.split('@')[0];
-      } else {
-        loginDiv.style.display = 'block';
-        sidebar.style.display = 'none';
-        mainContent.style.display = 'none';
-      }
-    });
-
-    signInBtn.addEventListener('click', () => {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      auth.signInWithEmailAndPassword(email, password)
-        .catch(error => alert(error.message));
-    });
-
-    signUpBtn.addEventListener('click', () => {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      auth.createUserWithEmailAndPassword(email, password)
-        .catch(error => alert(error.message));
-    });
-
-    signOutLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      auth.signOut();
-    });
-
-    document.querySelectorAll('nav ul li a').forEach(link => {
-      if (link.id === 'signOutLink') return;
-      link.addEventListener('click', e => {
-        e.preventDefault();
-        document.querySelectorAll('section').forEach(section => section.style.display = 'none');
-        const target = document.querySelector(link.getAttribute('href'));
-        if (target) target.style.display = 'block';
-      });
-    });
-  </script>
-
 </body>
 </html>
