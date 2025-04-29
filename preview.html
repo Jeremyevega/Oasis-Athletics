@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <div class="main-content">
+    <h1>Client Dashboard Preview</h1>
+    <h2>Workout Plan</h2>
+    <div id="previewWorkout"></div>
+
+    <h2>Nutrition Plan</h2>
+    <div id="previewMeals"></div>
+    <p id="macroTotals"></p>
+
+    <h2>Trainer Notes</h2>
+    <p id="trainerNoteText"></p>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBWzRFnpvX10kF7eCBezX3vY9MBVXlpV6g",
+      authDomain: "mytrainingapp-3a352.firebaseapp.com",
+      projectId: "mytrainingapp-3a352",
+      storageBucket: "mytrainingapp-3a352.appspot.com",
+      messagingSenderId: "802120004680",
+      appId: "1:802120004680:web:ac9496211c8d3de7f9147d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Get ?id=CLIENT_ID from URL
+    const params = new URLSearchParams(window.location.search);
+    const clientId = params.get('id');
+
+    if (!clientId) {
+      document.body.innerHTML = '<p style="color:red;">No client ID provided.</p>';
+    } else {
+      db.collection('clients').doc(clientId).get().then(doc => {
+        if (!doc.exists) {
+          document.body.innerHTML = '<p style="color:red;">Client not found.</p>';
+          return;
+        }
+
+        const data = doc.data();
+
+        const workout = data.workout || [];
+        const meals = data.meals || [];
+        const trainerNote = data.trainerNote || '';
+
+        // Show workouts
+        const workoutDiv = document.getElementById('previewWorkout');
+        workout.forEach(ex => {
+          const el = document.createElement('div');
+          el.innerHTML = `<p><strong>${ex.name}</strong><br>Sets/Reps: ${ex.setsReps}<br>Weight: ${ex.weight}<br>Rest: ${ex.rest}<br><a href="${ex.link}" target="_blank">Video</a></p><hr>`;
+          workoutDiv.appendChild(el);
+        });
+
+        // Show meals
+        let totalCals = 0, totalProtein = 0, totalCarbs = 0, totalFats = 0;
+        const mealDiv = document.getElementById('previewMeals');
+        meals.forEach(meal => {
+          totalCals += meal.calories || 0;
+          totalProtein += meal.protein || 0;
+          totalCarbs += meal.carbs || 0;
+          totalFats += meal.fats || 0;
+          const el = document.createElement('div');
+          el.innerHTML = `<p><strong>${meal.name}</strong><br>Calories: ${meal.calories} | Protein: ${meal.protein}g | Carbs: ${meal.carbs}g | Fats: ${meal.fats}g</p><hr>`;
+          mealDiv.appendChild(el);
+        });
+        document.getElementById('macroTotals').textContent = `Total: ${totalCals} kcal | Protein: ${totalProtein}g | Carbs: ${totalCarbs}g | Fats: ${totalFats}g`;
+
+        // Show trainer note
+        document.getElementById('trainerNoteText').textContent = trainerNote;
+      });
+    }
+  </script>
+</body>
+</html>
