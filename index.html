@@ -4,21 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Client Dashboard - [Your Brand]</title>
-
-  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
-  <!-- Link to your styles.css -->
   <link rel="stylesheet" href="styles.css">
-
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-
-  <!-- LOGIN PAGE -->
   <div id="login">
     <h2>Client Login</h2>
     <input type="email" id="email" placeholder="Email" required>
@@ -27,7 +19,6 @@
     <button id="signUpBtn">Sign Up</button>
   </div>
 
-  <!-- SIDEBAR (only shows after login) -->
   <div class="sidebar">
     <div class="logo-placeholder">LOGO</div>
     <nav>
@@ -44,7 +35,6 @@
     </nav>
   </div>
 
-  <!-- MAIN CONTENT -->
   <div class="main-content">
     <section id="dashboard">
       <h1>Welcome back, <span id="clientName">User</span>!</h1>
@@ -100,25 +90,18 @@
       </form>
     </section>
 
-    <!-- ADMIN PANEL (only for jeremyevega@icloud.com) -->
     <section id="admin-panel" style="display:none;">
       <h2>Admin Panel</h2>
-
-      <!-- Client Selector -->
       <label for="clientSelect">Select Client:</label>
       <select id="clientSelect">
         <option disabled selected>Choose a client</option>
       </select>
       <hr>
-
-      <!-- Workout Plan Editor -->
       <h3>Workout Plan</h3>
       <div id="workoutEditor">
         <button id="addWorkoutBtn">+ Add Exercise</button>
       </div>
       <hr>
-
-      <!-- Nutrition Plan Editor -->
       <h3>Nutrition Plan</h3>
       <div id="mealEditor">
         <h4>Meals</h4>
@@ -130,25 +113,18 @@
         </div>
       </div>
       <hr>
-
-      <!-- Notes -->
       <h3>Trainer Notes to Client</h3>
       <textarea id="trainerNote" placeholder="Enter message for client..."></textarea>
-
       <h3>Client Notes to Trainer</h3>
       <div id="clientNotesOutput">Loading client notes...</div>
       <hr>
-
-      <!-- Admin Actions -->
       <button id="previewBtn">🔍 Preview Client Dashboard</button>
       <button id="clearBtn">🧹 Clear Plan</button>
       <button id="undoBtn">↩️ Undo Last Change</button>
     </section>
   </div>
 
-  <!-- JavaScript -->
   <script>
-    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyBWzRFnpvX10kF7eCBezX3vY9MBVXlpV6g",
       authDomain: "mytrainingapp-3a352.firebaseapp.com",
@@ -162,7 +138,6 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // UI elements
     const loginDiv = document.getElementById('login');
     const sidebar = document.querySelector('.sidebar');
     const mainContent = document.querySelector('.main-content');
@@ -171,6 +146,7 @@
     const signUpBtn = document.getElementById('signUpBtn');
     const signOutLink = document.getElementById('signOutLink');
     const adminPanelLink = document.getElementById('adminPanelLink');
+    const clientSelect = document.getElementById('clientSelect');
 
     auth.onAuthStateChanged(user => {
       if (user) {
@@ -180,10 +156,18 @@
         mainContent.style.display = 'block';
         clientNameSpan.textContent = userEmail.split('@')[0];
 
-        // Show admin panel for admin email
         if (userEmail === 'jeremyevega@icloud.com') {
           adminPanelLink.style.display = 'block';
           document.getElementById('admin-panel').style.display = 'block';
+
+          db.collection('clients').get().then(snapshot => {
+            snapshot.forEach(doc => {
+              const opt = document.createElement('option');
+              opt.value = doc.id;
+              opt.textContent = doc.data().email;
+              clientSelect.appendChild(opt);
+            });
+          });
         }
       } else {
         loginDiv.style.display = 'block';
@@ -192,45 +176,33 @@
       }
     });
 
-    // Sign In
     signInBtn.addEventListener('click', () => {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      auth.signInWithEmailAndPassword(email, password)
-        .catch(error => alert(error.message));
+      auth.signInWithEmailAndPassword(email, password).catch(err => alert(err.message));
     });
 
-    // Sign Up
     signUpBtn.addEventListener('click', () => {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       auth.createUserWithEmailAndPassword(email, password)
-        .catch(error => alert(error.message));
+        .then(cred => db.collection('clients').doc(cred.user.uid).set({ email: cred.user.email }))
+        .catch(err => alert(err.message));
     });
 
-    // Sign Out
     signOutLink.addEventListener('click', e => {
       e.preventDefault();
       auth.signOut();
     });
 
-    // Basic navigation switching
     document.querySelectorAll('nav ul li a').forEach(link => {
       if (link.id === 'signOutLink') return;
-      if (link.id === 'adminPanelLink') {
-        link.addEventListener('click', e => {
-          e.preventDefault();
-          document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
-          document.getElementById('admin-panel').style.display = 'block';
-        });
-      } else {
-        link.addEventListener('click', e => {
-          e.preventDefault();
-          document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
-          const targetId = link.getAttribute('href').substring(1);
-          document.getElementById(targetId).style.display = 'block';
-        });
-      }
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
+        const id = link.getAttribute('href').substring(1);
+        document.getElementById(id).style.display = 'block';
+      });
     });
   </script>
 </body>
