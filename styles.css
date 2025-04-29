@@ -20,10 +20,10 @@ body {
     background-color: #1a1a1a;
     color: white;
     padding: 20px;
-    display: none; /* Hidden by default (shown after login) */
+    display: none; /* Hidden until user logs in */
 }
 
-/* Logo inside Sidebar */
+/* Logo Placeholder */
 .logo-placeholder {
     font-size: 1.5em;
     font-weight: bold;
@@ -31,7 +31,7 @@ body {
     text-align: center;
 }
 
-/* Navigation Links */
+/* Navigation */
 nav ul {
     list-style: none;
 }
@@ -52,10 +52,10 @@ nav ul li a:hover {
 .main-content {
     flex: 1;
     padding: 40px;
-    display: none; /* Hidden by default (shown after login) */
+    display: none; /* Hidden until user logs in */
 }
 
-/* Sections inside Main Content */
+/* Sections */
 section {
     display: none;
 }
@@ -79,7 +79,7 @@ h1, h2, h3 {
     border-radius: 5px;
 }
 
-/* Form Inputs, Textareas, Buttons */
+/* Forms, Inputs, Buttons */
 textarea,
 input[type="text"],
 input[type="email"],
@@ -118,7 +118,7 @@ button:hover {
     margin-bottom: 15px;
 }
 
-/* Responsive Mobile Layout */
+/* Mobile Responsive Design */
 @media (max-width: 768px) {
     .sidebar {
         width: 18% !important;
