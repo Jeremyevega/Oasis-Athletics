@@ -1,140 +1,43 @@
-/* Reset + Base Styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
-
-/* Body Layout */
 body {
-    display: flex;
-    min-height: 100vh;
-    background-color: #f3f3f3;
-    color: #111;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f4f4f4;
+  color: #111;
+  margin: 0;
+  padding: 20px;
+  overflow-x: hidden; /* prevent horizontal scroll */
 }
 
-/* Sidebar */
-.sidebar {
-    width: 250px;
-    background-color: #1a1a1a;
-    color: white;
-    padding: 20px;
-    display: none; /* Hidden until user logs in */
-}
-
-/* Logo */
-.logo-placeholder {
-    font-size: 1.5em;
-    font-weight: bold;
-    margin-bottom: 30px;
-    text-align: center;
-}
-
-/* Navigation */
-nav ul {
-    list-style: none;
-}
-nav ul li {
-    margin: 15px 0;
-}
-nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: 1em;
-    transition: 0.3s;
-}
-nav ul li a:hover {
-    color: #ccc;
-}
-
-/* Main Content */
 .main-content {
-    flex: 1;
-    padding: 40px;
-    display: none; /* Hidden until user logs in */
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  position: relative;
+  z-index: 1;
 }
 
-/* Sections */
-section {
-    display: none;
-}
-section:target,
-#dashboard {
-    display: block;
+h1, h2 {
+  color: #222;
+  margin-top: 0;
 }
 
-/* Headings */
-h1, h2, h3 {
-    margin-bottom: 15px;
+p {
+  line-height: 1.6;
 }
 
-/* Workout and Nutrition Cards */
-.workout-day,
-.meal-plan {
-    margin-bottom: 20px;
-    padding: 15px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 10px 0;
 }
 
-/* Forms, Inputs, Textareas, Buttons */
-textarea,
-input[type="text"],
-input[type="email"],
-input[type="password"],
-button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-family: 'Poppins', sans-serif;
+a {
+  color: #0077cc;
+  text-decoration: none;
 }
 
-/* Button Styling */
-button {
-    background-color: #1a1a1a;
-    color: white;
-    cursor: pointer;
-}
-button:hover {
-    background-color: #333;
-}
-
-/* Login Page */
-#login {
-    display: none; /* Shown only when not logged in */
-    width: 100%;
-    max-width: 400px;
-    margin: 100px auto;
-    background: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-#login input {
-    margin-bottom: 15px;
-}
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 18% !important;
-        padding: 10px;
-        text-align: center;
-    }
-
-    .logo-placeholder {
-        font-size: 1.2em;
-        margin-bottom: 20px;
-    }
-
-    .main-content {
-        padding: 20px;
-        flex: 1;
-        display: block;
-    }
+a:hover {
+  text-decoration: underline;
 }
