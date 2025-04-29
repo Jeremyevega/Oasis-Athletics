@@ -187,12 +187,20 @@
     });
 
     signUpBtn.addEventListener('click', () => {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(cred => db.collection('clients').doc(cred.user.uid).set({ email: cred.user.email }))
-        .catch(err => alert(err.message));
-    });
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(cred => {
+      return db.collection('clients').doc(cred.user.uid).set({
+        email: cred.user.email,
+        meals: [],
+        workout: [],
+        trainerNote: ""
+      });
+    })
+    .catch(err => alert(err.message));
+});
 
     signOutLink.addEventListener('click', e => {
       e.preventDefault();
