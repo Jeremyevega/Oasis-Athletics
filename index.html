@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Client Dashboard - [Your Brand]</title>
 
-  <!-- Link your new CSS -->
+  <!-- Link to your styles.css -->
   <link rel="stylesheet" href="styles.css">
 
-  <!-- Firebase SDKs (Authentication) -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 
-  <!-- LOGIN PAGE (shows first) -->
+  <!-- LOGIN PAGE -->
   <div id="login">
     <h2>Client Login</h2>
     <input type="email" id="email" placeholder="Email" required>
@@ -23,7 +23,7 @@
     <button id="signUpBtn">Sign Up</button>
   </div>
 
-  <!-- SIDEBAR (hidden until login) -->
+  <!-- SIDEBAR (only shows after login) -->
   <div class="sidebar">
     <div class="logo-placeholder">LOGO</div>
     <nav>
@@ -39,15 +39,13 @@
     </nav>
   </div>
 
-  <!-- MAIN CONTENT (hidden until login) -->
+  <!-- MAIN CONTENT -->
   <div class="main-content">
-    <!-- Dashboard -->
     <section id="dashboard">
       <h1>Welcome back, <span id="clientName">User</span>!</h1>
       <p>Select an option from the menu to get started.</p>
     </section>
 
-    <!-- Workout Plan -->
     <section id="workout">
       <h2>Workout Plan</h2>
       <div class="workout-day">
@@ -64,7 +62,6 @@
       </div>
     </section>
 
-    <!-- Nutrition -->
     <section id="nutrition">
       <h2>Nutrition</h2>
       <div class="meal-plan">
@@ -74,7 +71,6 @@
       </div>
     </section>
 
-    <!-- Progress Tracking -->
     <section id="progress">
       <h2>Progress Tracking</h2>
       <p>Log your daily workouts and meals here.</p>
@@ -82,7 +78,6 @@
       <button>Submit Log</button>
     </section>
 
-    <!-- Notes -->
     <section id="notes">
       <h2>Notes</h2>
       <p>Leave your trainer a note if needed:</p>
@@ -90,7 +85,6 @@
       <button>Submit Note</button>
     </section>
 
-    <!-- Contact -->
     <section id="contact">
       <h2>Contact</h2>
       <form>
@@ -102,19 +96,23 @@
     </section>
   </div>
 
-  <!-- JavaScript at the bottom -->
+  <!-- JavaScript -->
   <script>
-    // --- Firebase Configuration ---
+    // ✅ YOUR FIREBASE CONFIG
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      // Add other keys if needed
+      apiKey: "AIzaSyBWzRFnpvX10kF7eCBezX3vY9MBVXlpV6g",
+      authDomain: "mytrainingapp-3a352.firebaseapp.com",
+      projectId: "mytrainingapp-3a352",
+      storageBucket: "mytrainingapp-3a352.firebasestorage.app",
+      messagingSenderId: "802120004680",
+      appId: "1:802120004680:web:ac9496211c8d3de7f9147d",
+      measurementId: "G-PZZJ4EFED4"
     };
+
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // --- UI Elements ---
+    // UI Elements
     const loginDiv = document.getElementById('login');
     const sidebar = document.querySelector('.sidebar');
     const mainContent = document.querySelector('.main-content');
@@ -123,7 +121,7 @@
     const signUpBtn = document.getElementById('signUpBtn');
     const signOutLink = document.getElementById('signOutLink');
 
-    // --- Auth State Handling ---
+    // Auth listener
     auth.onAuthStateChanged(user => {
       if (user) {
         loginDiv.style.display = 'none';
@@ -137,7 +135,7 @@
       }
     });
 
-    // --- Sign In ---
+    // Sign In
     signInBtn.addEventListener('click', () => {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
@@ -145,7 +143,7 @@
         .catch(error => alert(error.message));
     });
 
-    // --- Sign Up ---
+    // Sign Up
     signUpBtn.addEventListener('click', () => {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
@@ -153,15 +151,15 @@
         .catch(error => alert(error.message));
     });
 
-    // --- Sign Out ---
+    // Sign Out
     signOutLink.addEventListener('click', (e) => {
       e.preventDefault();
       auth.signOut();
     });
 
-    // --- Navigation Switching ---
+    // Page Navigation
     document.querySelectorAll('nav ul li a').forEach(link => {
-      if (link.id === 'signOutLink') return; // Ignore logout button
+      if (link.id === 'signOutLink') return;
       link.addEventListener('click', e => {
         e.preventDefault();
         document.querySelectorAll('section').forEach(section => section.style.display = 'none');
