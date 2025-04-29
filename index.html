@@ -97,142 +97,186 @@
       <hr>
       <h3>Workout Plan</h3>
       <div id="workoutEditor">
-        <button id="addWorkoutBtn">+ Add Exercise</button>
-      </div>
-      <hr>
-      <h3>Nutrition Plan</h3>
-      <div id="mealEditor">
-        <h4>Meals</h4>
-        <div id="mealsList"></div>
-        <button id="addMealBtn">+ Add Meal</button>
-        <div style="margin-top: 10px;">
-          <strong>Total for Day:</strong>
-          <p id="dailyTotal">Calories: 0 | Protein: 0g | Carbs: 0g | Fats: 0g</p>
-        </div>
-      </div>
-      <hr>
-      <h3>Trainer Notes to Client</h3>
-      <textarea id="trainerNote" placeholder="Enter message for client..."></textarea>
-      <h3>Client Notes to Trainer</h3>
-      <div id="clientNotesOutput">Loading client notes...</div>
-      <hr>
-      <button id="previewBtn">🔍 Preview Client Dashboard</button>
-      <button id="clearBtn">🧹 Clear Plan</button>
-      <button id="undoBtn">↩️ Undo Last Change</button>
-    </section>
-  </div>
+  <div id="exerciseList"></div>
+  <button id="addWorkoutBtn">+ Add Exercise</button>
+</div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBWzRFnpvX10kF7eCBezX3vY9MBVXlpV6g",
-      authDomain: "mytrainingapp-3a352.firebaseapp.com",
-      projectId: "mytrainingapp-3a352",
-      storageBucket: "mytrainingapp-3a352.appspot.com",
-      messagingSenderId: "802120004680",
-      appId: "1:802120004680:web:ac9496211c8d3de7f9147d"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBWzRFnpvX10kF7eCBezX3vY9MBVXlpV6g",
+    authDomain: "mytrainingapp-3a352.firebaseapp.com",
+    projectId: "mytrainingapp-3a352",
+    storageBucket: "mytrainingapp-3a352.appspot.com",
+    messagingSenderId: "802120004680",
+    appId: "1:802120004680:web:ac9496211c8d3de7f9147d"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
-    const loginDiv = document.getElementById('login');
-    const sidebar = document.querySelector('.sidebar');
-    const mainContent = document.querySelector('.main-content');
-    const clientNameSpan = document.getElementById('clientName');
-    const signInBtn = document.getElementById('signInBtn');
-    const signUpBtn = document.getElementById('signUpBtn');
-    const signOutLink = document.getElementById('signOutLink');
-    const adminPanelLink = document.getElementById('adminPanelLink');
-    const clientSelect = document.getElementById('clientSelect');
+  const loginDiv = document.getElementById('login');
+  const sidebar = document.querySelector('.sidebar');
+  const mainContent = document.querySelector('.main-content');
+  const clientNameSpan = document.getElementById('clientName');
+  const signInBtn = document.getElementById('signInBtn');
+  const signUpBtn = document.getElementById('signUpBtn');
+  const signOutLink = document.getElementById('signOutLink');
+  const adminPanelLink = document.getElementById('adminPanelLink');
+  const clientSelect = document.getElementById('clientSelect');
 
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        const userEmail = user.email;
-        loginDiv.style.display = 'none';
-        sidebar.style.display = 'block';
-        mainContent.style.display = 'block';
-        clientNameSpan.textContent = userEmail.split('@')[0];
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      const userEmail = user.email;
+      loginDiv.style.display = 'none';
+      sidebar.style.display = 'block';
+      mainContent.style.display = 'block';
+      clientNameSpan.textContent = userEmail.split('@')[0];
 
-        adminPanelLink.style.display = 'none';
-        document.getElementById('admin-panel').style.display = 'none';
+      adminPanelLink.style.display = 'none';
+      document.getElementById('admin-panel').style.display = 'none';
 
-        if (userEmail === 'jeremyevega@icloud.com') {
-          adminPanelLink.style.display = 'block';
-          document.getElementById('admin-panel').style.display = 'block';
+      if (userEmail === 'jeremyevega@icloud.com') {
+        adminPanelLink.style.display = 'block';
+        document.getElementById('admin-panel').style.display = 'block';
 
-          db.collection('clients').get().then(snapshot => {
-            snapshot.forEach(doc => {
-              const opt = document.createElement('option');
-              opt.value = doc.id;
-              opt.textContent = doc.data().email;
-              clientSelect.appendChild(opt);
-            });
+        db.collection('clients').get().then(snapshot => {
+          snapshot.forEach(doc => {
+            const opt = document.createElement('option');
+            opt.value = doc.id;
+            opt.textContent = doc.data().email;
+            clientSelect.appendChild(opt);
           });
-        }
-      } else {
-        loginDiv.style.display = 'block';
-        sidebar.style.display = 'none';
-        mainContent.style.display = 'none';
+        });
       }
-    });
+    } else {
+      loginDiv.style.display = 'block';
+      sidebar.style.display = 'none';
+      mainContent.style.display = 'none';
+    }
+  });
 
-    signInBtn.addEventListener('click', () => {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      auth.signInWithEmailAndPassword(email, password).catch(err => alert(err.message));
-    });
+  signInBtn.addEventListener('click', () => {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    auth.signInWithEmailAndPassword(email, password).catch(err => alert(err.message));
+  });
 
-    signUpBtn.addEventListener('click', () => {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(cred => {
-          return db.collection('clients').doc(cred.user.uid).set({
-            email: cred.user.email,
-            meals: [
-              {
-                name: "Oats and Protein Shake",
-                calories: 350,
-                protein: 30,
-                carbs: 40,
-                fats: 8
-              }
-            ],
-            workout: [
-              {
-                name: "Push-ups",
-                setsReps: "3x15",
-                weight: "Bodyweight",
-                rest: "60 sec",
-                link: "https://www.youtube.com/watch?v=_l3ySVKYVJ8"
-              }
-            ],
-            trainerNote: "Welcome to your program! Let’s get to work!"
-          });
-        })
-        .catch(err => alert(err.message));
-    });
+  signUpBtn.addEventListener('click', () => {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(cred => {
+        return db.collection('clients').doc(cred.user.uid).set({
+          email: cred.user.email,
+          meals: [
+            {
+              name: "Oats and Protein Shake",
+              calories: 350,
+              protein: 30,
+              carbs: 40,
+              fats: 8
+            }
+          ],
+          workout: [
+            {
+              name: "Push-ups",
+              setsReps: "3x15",
+              weight: "Bodyweight",
+              rest: "60 sec",
+              link: "https://www.youtube.com/watch?v=_l3ySVKYVJ8"
+            }
+          ],
+          trainerNote: "Welcome to your program! Let’s get to work!"
+        });
+      })
+      .catch(err => alert(err.message));
+  });
 
-    signOutLink.addEventListener('click', e => {
+  signOutLink.addEventListener('click', e => {
+    e.preventDefault();
+    auth.signOut();
+  });
+
+  document.querySelectorAll('nav ul li a').forEach(link => {
+    if (link.id === 'signOutLink') return;
+    link.addEventListener('click', e => {
       e.preventDefault();
-      auth.signOut();
+      document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
+      const id = link.getAttribute('href').substring(1);
+      document.getElementById(id).style.display = 'block';
+    });
+  });
+
+  document.getElementById('previewBtn').addEventListener('click', () => {
+    const clientId = clientSelect.value;
+    if (!clientId) return alert('Please select a client first.');
+    window.open(`preview.html?id=${clientId}`, '_blank');
+  });
+
+  // Workout plan input logic
+  const exerciseList = document.getElementById('exerciseList');
+  const addWorkoutBtn = document.getElementById('addWorkoutBtn');
+
+  function createExerciseInputs(data = {}) {
+    const container = document.createElement('div');
+    container.style.marginBottom = '20px';
+
+    const name = document.createElement('input');
+    name.placeholder = 'Exercise name';
+    name.value = data.name || '';
+
+    const setsReps = document.createElement('input');
+    setsReps.placeholder = 'Sets x Reps';
+    setsReps.value = data.setsReps || '';
+
+    const weight = document.createElement('input');
+    weight.placeholder = 'Weight';
+    weight.value = data.weight || '';
+
+    const rest = document.createElement('input');
+    rest.placeholder = 'Rest time';
+    rest.value = data.rest || '';
+
+    const link = document.createElement('input');
+    link.placeholder = 'Video link';
+    link.value = data.link || '';
+
+    [name, setsReps, weight, rest, link].forEach(input => {
+      input.style.display = 'block';
+      input.style.marginBottom = '5px';
+      input.addEventListener('input', () => saveWorkoutData());
+      container.appendChild(input);
     });
 
-    document.querySelectorAll('nav ul li a').forEach(link => {
-      if (link.id === 'signOutLink') return;
-      link.addEventListener('click', e => {
-        e.preventDefault();
-        document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
-        const id = link.getAttribute('href').substring(1);
-        document.getElementById(id).style.display = 'block';
+    exerciseList.appendChild(container);
+  }
+
+  addWorkoutBtn.addEventListener('click', () => {
+    createExerciseInputs();
+    saveWorkoutData();
+  });
+
+  function saveWorkoutData() {
+    const clientId = clientSelect.value;
+    if (!clientId) return;
+
+    const exercises = [];
+    const blocks = exerciseList.querySelectorAll('div');
+
+    blocks.forEach(block => {
+      const inputs = block.querySelectorAll('input');
+      exercises.push({
+        name: inputs[0].value,
+        setsReps: inputs[1].value,
+        weight: inputs[2].value,
+        rest: inputs[3].value,
+        link: inputs[4].value
       });
     });
 
-    document.getElementById('previewBtn').addEventListener('click', () => {
-      const clientId = clientSelect.value;
-      if (!clientId) return alert('Please select a client first.');
-      window.open(`preview.html?id=${clientId}`, '_blank');
-    });
-  </script>
+    db.collection('clients').doc(clientId).update({ workout: exercises });
+  }
+</script>
+      
 </body>
 </html>
