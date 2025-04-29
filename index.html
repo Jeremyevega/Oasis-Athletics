@@ -5,12 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Client Dashboard - [Your Brand]</title>
 
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
   <!-- Link to your styles.css -->
   <link rel="stylesheet" href="styles.css">
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
 </head>
 <body>
 
@@ -98,7 +110,6 @@
 
   <!-- JavaScript -->
   <script>
-    // ✅ YOUR FIREBASE CONFIG
     const firebaseConfig = {
       apiKey: "AIzaSyBWzRFnpvX10kF7eCBezX3vY9MBVXlpV6g",
       authDomain: "mytrainingapp-3a352.firebaseapp.com",
@@ -112,7 +123,6 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // UI Elements
     const loginDiv = document.getElementById('login');
     const sidebar = document.querySelector('.sidebar');
     const mainContent = document.querySelector('.main-content');
@@ -121,7 +131,6 @@
     const signUpBtn = document.getElementById('signUpBtn');
     const signOutLink = document.getElementById('signOutLink');
 
-    // Auth listener
     auth.onAuthStateChanged(user => {
       if (user) {
         loginDiv.style.display = 'none';
@@ -135,7 +144,6 @@
       }
     });
 
-    // Sign In
     signInBtn.addEventListener('click', () => {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
@@ -143,7 +151,6 @@
         .catch(error => alert(error.message));
     });
 
-    // Sign Up
     signUpBtn.addEventListener('click', () => {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
@@ -151,13 +158,11 @@
         .catch(error => alert(error.message));
     });
 
-    // Sign Out
     signOutLink.addEventListener('click', (e) => {
       e.preventDefault();
       auth.signOut();
     });
 
-    // Page Navigation
     document.querySelectorAll('nav ul li a').forEach(link => {
       if (link.id === 'signOutLink') return;
       link.addEventListener('click', e => {
