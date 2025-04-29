@@ -155,6 +155,11 @@
         mainContent.style.display = 'block';
         clientNameSpan.textContent = userEmail.split('@')[0];
 
+        // Hide admin panel by default
+        adminPanelLink.style.display = 'none';
+        document.getElementById('admin-panel').style.display = 'none';
+
+        // Show admin panel only for specific email
         if (userEmail === 'jeremyevega@icloud.com') {
           adminPanelLink.style.display = 'block';
           document.getElementById('admin-panel').style.display = 'block';
@@ -204,152 +209,11 @@
       });
     });
 
-    clientSelect.addEventListener('change', () => {
+    document.getElementById('previewBtn').addEventListener('click', () => {
       const clientId = clientSelect.value;
-      const docRef = db.collection('clients').doc(clientId);
-
-      docRef.get().then(doc => {
-        if (!doc.exists) return;
-        const data = doc.data();
-        clearWorkoutEditor();
-        clearMealsList();
-        (data.workout || []).forEach(ex => addExerciseUI(ex));
-        (data.meals || []).forEach(meal => addMealUI(meal));
-        document.getElementById('trainerNote').value = data.trainerNote || '';
-        displayClientNotes(data.clientNotes || []);
-        updateDailyTotals();
-        lastSavedState = JSON.parse(JSON.stringify(data));
-      });
+      if (!clientId) return alert('Please select a client first.');
+      window.open(`preview.html?id=${clientId}`, '_blank');
     });
-
-    function clearWorkoutEditor() {
-      const editor = document.getElementById('workoutEditor');
-      editor.innerHTML = '<button id="addWorkoutBtn">+ Add Exercise</button>';
-      document.getElementById('addWorkoutBtn')?.addEventListener('click', () => addExerciseUI());
-    }
-
-    function addExerciseUI(ex = {}) {
-      const container = document.getElementById('workoutEditor');
-      const div = document.createElement('div');
-      div.classList.add('exercise-block');
-      div.innerHTML = `
-        <input placeholder="Exercise name" value="${ex.name || ''}">
-        <input placeholder="Sets x Reps" value="${ex.setsReps || ''}">
-        <input placeholder="Weight" value="${ex.weight || ''}">
-        <input placeholder="Rest Time" value="${ex.rest || ''}">
-        <input placeholder="YouTube link" value="${ex.link || ''}">
-        <button onclick="this.parentNode.remove()">✖️ Remove</button>
-        <hr>
-      `;
-      container.insertBefore(div, document.getElementById('addWorkoutBtn'));
-    }
-
-    function clearMealsList() {
-      const list = document.getElementById('mealsList');
-      list.innerHTML = '';
-      document.getElementById('addMealBtn')?.addEventListener('click', () => addMealUI());
-    }
-
-    function addMealUI(meal = {}) {
-      const list = document.getElementById('mealsList');
-      const div = document.createElement('div');
-      div.classList.add('meal-block');
-      div.innerHTML = `
-        <input placeholder="Meal name" value="${meal.name || ''}">
-        <input placeholder="Calories" type="number" value="${meal.calories || 0}">
-        <input placeholder="Protein (g)" type="number" value="${meal.protein || 0}">
-        <input placeholder="Carbs (g)" type="number" value="${meal.carbs || 0}">
-        <input placeholder="Fats (g)" type="number" value="${meal.fats || 0}">
-        <button onclick="this.parentNode.remove(); updateDailyTotals()">✖️ Remove</button>
-        <hr>
-      `;
-      list.appendChild(div);
-      div.querySelectorAll('input[type="number"]').forEach(input =>
-        input.addEventListener('input', updateDailyTotals)
-      );
-    }
-
-    function updateDailyTotals() {
-      let calories = 0, protein = 0, carbs = 0, fats = 0;
-      document.querySelectorAll('.meal-block').forEach(div => {
-        calories += Number(div.children[1].value) || 0;
-        protein  += Number(div.children[2].value) || 0;
-        carbs    += Number(div.children[3].value) || 0;
-        fats     += Number(div.children[4].value) || 0;
-      });
-      document.getElementById('dailyTotal').textContent =
-        `Calories: ${calories} | Protein: ${protein}g | Carbs: ${carbs}g | Fats: ${fats}g`;
-    }
-
-    function displayClientNotes(notes = []) {
-      const output = document.getElementById('clientNotesOutput');
-      output.innerHTML = notes.length
-        ? notes.map(n => `<p>• ${n}</p>`).join('')
-        : '<p>No notes yet.</p>';
-    }
-
-    document.addEventListener('input', autoSaveClientData);
-
-    function autoSaveClientData() {
-      const clientId = clientSelect.value;
-      if (!clientId) return;
-
-      const workoutData = [...document.querySelectorAll('#workoutEditor .exercise-block')].map(div => ({
-        name: div.children[0].value,
-        setsReps: div.children[1].value,
-        weight: div.children[2].value,
-        rest: div.children[3].value,
-        link: div.children[4].value
-      }));
-
-      const mealData = [...document.querySelectorAll('#mealsList .meal-block')].map(div => ({
-        name: div.children[0].value,
-        calories: Number(div.children[1].value),
-        protein: Number(div.children[2].value),
-        carbs: Number(div.children[3].value),
-        fats: Number(div.children[4].value)
-      }));
-
-      const trainerNote = document.getElementById('trainerNote').value;
-
-      const newState = {
-        workout: workoutData,
-        meals: mealData,
-        trainerNote: trainerNote
-      };
-
-      db.collection('clients').doc(clientId).update(newState);
-    }
-
-    document.getElementById('clearBtn').addEventListener('click', () => {
-      clearWorkoutEditor();
-      clearMealsList();
-      document.getElementById('trainerNote').value = '';
-      document.getElementById('clientNotesOutput').innerHTML = '';
-      updateDailyTotals();
-      autoSaveClientData();
-    });
-
-    document.getElementById('undoBtn').addEventListener('click', () => {
-      if (!lastSavedState) return;
-      clearWorkoutEditor();
-      clearMealsList();
-      (lastSavedState.workout || []).forEach(ex => addExerciseUI(ex));
-      (lastSavedState.meals || []).forEach(meal => addMealUI(meal));
-      document.getElementById('trainerNote').value = lastSavedState.trainerNote || '';
-      updateDailyTotals();
-    });
-
-   document.getElementById('previewBtn').addEventListener('click', () => {
-  const clientId = clientSelect.value;
-  if (!clientId) return alert('Please select a client first.');
-  window.open(`preview.html?id=${clientId}`, '_blank');
-    });
-     document.getElementById('previewBtn').addEventListener('click', () => {
-    const clientId = clientSelect.value;
-    if (!clientId) return alert('Please select a client first.');
-    window.open(`preview.html?id=${clientId}`, '_blank');
-  });
   </script>
 </body>
 </html>
