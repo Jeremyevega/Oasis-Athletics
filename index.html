@@ -19,7 +19,7 @@
     <button id="signUpBtn">Sign Up</button>
   </div>
 
-  <div class="sidebar">
+  <div class="sidebar" style="display: none;">
     <div class="logo-placeholder">LOGO</div>
     <nav>
       <ul>
@@ -32,7 +32,7 @@
     </nav>
   </div>
 
-  <div class="main-content">
+  <div class="main-content" style="display: none;">
     <section id="dashboard">
       <h1>Welcome, <span id="clientName">User</span>!</h1>
       <p>Select a tab to view your plan.</p>
@@ -115,7 +115,7 @@
     let currentUserId = null;
 
     auth.onAuthStateChanged(user => {
-      if (!user) return location.reload();
+      if (!user) return;
       currentUserId = user.uid;
       loginDiv.style.display = 'none';
       sidebar.style.display = 'block';
@@ -192,26 +192,24 @@
       }).catch(e => alert(e.message));
     };
 
-    signOutLink.onclick = () => auth.signOut();
+    signOutLink.onclick = () => {
+      auth.signOut().then(() => {
+        window.location.reload();
+      });
+    };
 
     addWorkoutBtn.onclick = () => {
       const container = document.createElement('div');
-      const name = document.createElement('input');
-      const setsReps = document.createElement('input');
-      const weight = document.createElement('input');
-      const rest = document.createElement('input');
-
-      name.placeholder = 'Name';
-      setsReps.placeholder = 'Sets x Reps';
-      weight.placeholder = 'Weight';
-      rest.placeholder = 'Rest';
-
-      [name, setsReps, weight, rest].forEach(el => {
-        el.style.display = 'block';
-        el.addEventListener('input', saveWorkouts);
-        container.appendChild(el);
-      });
+      container.innerHTML = `
+        <label>Exercise Name:</label><input placeholder="Name">
+        <label>Sets x Reps:</label><input placeholder="Sets x Reps">
+        <label>Weight:</label><input placeholder="Weight">
+        <label>Rest:</label><input placeholder="Rest">
+      `;
       container.dataset.day = workoutDay.value;
+      [...container.querySelectorAll('input')].forEach(input => {
+        input.addEventListener('input', saveWorkouts);
+      });
       exerciseList.appendChild(container);
       saveWorkouts();
     };
@@ -235,20 +233,15 @@
 
     addMealBtn.onclick = () => {
       const container = document.createElement('div');
-      const name = document.createElement('input');
-      const cal = document.createElement('input');
-      const p = document.createElement('input');
-      const c = document.createElement('input');
-      const f = document.createElement('input');
-      name.placeholder = 'Meal';
-      cal.placeholder = 'Calories';
-      p.placeholder = 'Protein';
-      c.placeholder = 'Carbs';
-      f.placeholder = 'Fats';
-      [name, cal, p, c, f].forEach(input => {
-        input.style.display = 'block';
+      container.innerHTML = `
+        <label>Meal Name:</label><input placeholder="Name">
+        <label>Calories:</label><input placeholder="Calories">
+        <label>Protein:</label><input placeholder="Protein">
+        <label>Carbs:</label><input placeholder="Carbs">
+        <label>Fats:</label><input placeholder="Fats">
+      `;
+      [...container.querySelectorAll('input')].forEach(input => {
         input.addEventListener('input', saveMeals);
-        container.appendChild(input);
       });
       mealList.appendChild(container);
       saveMeals();
@@ -287,38 +280,29 @@
         data.workout?.forEach(ex => {
           const container = document.createElement('div');
           container.dataset.day = ex.day || 'Unassigned';
-          const name = document.createElement('input');
-          name.value = ex.name || '';
-          const setsReps = document.createElement('input');
-          setsReps.value = ex.setsReps || '';
-          const weight = document.createElement('input');
-          weight.value = ex.weight || '';
-          const rest = document.createElement('input');
-          rest.value = ex.rest || '';
-          [name, setsReps, weight, rest].forEach(input => {
-            input.style.display = 'block';
+          container.innerHTML = `
+            <label>Exercise Name:</label><input value="${ex.name || ''}">
+            <label>Sets x Reps:</label><input value="${ex.setsReps || ''}">
+            <label>Weight:</label><input value="${ex.weight || ''}">
+            <label>Rest:</label><input value="${ex.rest || ''}">
+          `;
+          [...container.querySelectorAll('input')].forEach(input => {
             input.addEventListener('input', saveWorkouts);
-            container.appendChild(input);
           });
           exerciseList.appendChild(container);
         });
         mealList.innerHTML = '';
         data.meals?.forEach(meal => {
           const container = document.createElement('div');
-          const name = document.createElement('input');
-          name.value = meal.name || '';
-          const cal = document.createElement('input');
-          cal.value = meal.calories || 0;
-          const p = document.createElement('input');
-          p.value = meal.protein || 0;
-          const c = document.createElement('input');
-          c.value = meal.carbs || 0;
-          const f = document.createElement('input');
-          f.value = meal.fats || 0;
-          [name, cal, p, c, f].forEach(input => {
-            input.style.display = 'block';
+          container.innerHTML = `
+            <label>Meal Name:</label><input value="${meal.name || ''}">
+            <label>Calories:</label><input value="${meal.calories || 0}">
+            <label>Protein:</label><input value="${meal.protein || 0}">
+            <label>Carbs:</label><input value="${meal.carbs || 0}">
+            <label>Fats:</label><input value="${meal.fats || 0}">
+          `;
+          [...container.querySelectorAll('input')].forEach(input => {
             input.addEventListener('input', saveMeals);
-            container.appendChild(input);
           });
           mealList.appendChild(container);
         });
