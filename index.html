@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Client Dashboard - [Your Brand]</title>
+  <title>Client Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -13,8 +13,8 @@
 <body>
   <div id="login">
     <h2>Client Login</h2>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Password" required>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
     <button id="signInBtn">Sign In</button>
     <button id="signUpBtn">Sign Up</button>
   </div>
@@ -26,9 +26,6 @@
         <li><a href="#dashboard">Dashboard</a></li>
         <li><a href="#workout">Workout Plan</a></li>
         <li><a href="#nutrition">Nutrition</a></li>
-        <li><a href="#progress">Progress Tracking</a></li>
-        <li><a href="#notes">Notes</a></li>
-        <li><a href="#contact">Contact</a></li>
         <li><a href="#admin-panel" id="adminPanelLink" style="display:none;">Admin Panel</a></li>
         <li><a href="#" id="signOutLink">Logout</a></li>
       </ul>
@@ -37,55 +34,19 @@
 
   <div class="main-content">
     <section id="dashboard">
-      <h1>Welcome back, <span id="clientName">User</span>!</h1>
-      <p>Select an option from the menu to get started.</p>
+      <h1>Welcome, <span id="clientName">User</span>!</h1>
+      <p>Select a tab to view your plan.</p>
     </section>
 
     <section id="workout">
-      <h2>Workout Plan</h2>
-      <div class="workout-day">
-        <h3>Monday</h3>
-        <ul>
-          <li>
-            <strong>Exercise:</strong> Bench Press<br>
-            <strong>Sets/Reps:</strong> 4x10<br>
-            <strong>Starting Weight:</strong> 135 lbs<br>
-            <strong>Rest Time:</strong> 90 seconds<br>
-            <a href="https://youtube.com" target="_blank">View Demo</a>
-          </li>
-        </ul>
-      </div>
+      <h2>Your Workout Plan</h2>
+      <div id="clientWorkoutOutput"></div>
     </section>
 
     <section id="nutrition">
-      <h2>Nutrition</h2>
-      <div class="meal-plan">
-        <h3>Breakfast</h3>
-        <p>Oats with Protein Powder - 300 calories</p>
-        <p>Protein: 20g, Carbs: 40g, Fat: 5g</p>
-      </div>
-    </section>
-
-    <section id="progress">
-      <h2>Progress Tracking</h2>
-      <textarea placeholder="Workout log for today..."></textarea>
-      <button>Submit Log</button>
-    </section>
-
-    <section id="notes">
-      <h2>Notes</h2>
-      <textarea placeholder="Write your note here..."></textarea>
-      <button>Submit Note</button>
-    </section>
-
-    <section id="contact">
-      <h2>Contact</h2>
-      <form>
-        <input type="text" placeholder="Name" required><br>
-        <input type="email" placeholder="Email" required><br>
-        <textarea placeholder="Message" required></textarea><br>
-        <button type="submit">Send Message</button>
-      </form>
+      <h2>Your Meal Plan</h2>
+      <div id="clientMealOutput"></div>
+      <p id="clientMacroTotal"></p>
     </section>
 
     <section id="admin-panel" style="display:none;">
@@ -94,31 +55,27 @@
       <select id="clientSelect">
         <option disabled selected>Choose a client</option>
       </select>
-      <hr>
-      <h3>Workout Plan</h3>
-      <div id="workoutEditor">
-        <div id="exerciseList"></div>
-        <button id="addWorkoutBtn">+ Add Exercise</button>
-      </div>
-      <hr>
-      <h3>Nutrition Plan</h3>
-      <div id="mealEditor">
-        <div id="mealList"></div>
-        <button id="addMealBtn">+ Add Meal</button>
-        <div style="margin-top: 10px;">
-          <strong>Total for Day:</strong>
-          <p id="dailyTotal">Calories: 0 | Protein: 0g | Carbs: 0g | Fats: 0g</p>
-        </div>
-      </div>
-      <hr>
-      <h3>Trainer Notes to Client</h3>
-      <textarea id="trainerNote" placeholder="Enter message for client..."></textarea>
-      <h3>Client Notes to Trainer</h3>
-      <div id="clientNotesOutput">Loading client notes...</div>
-      <hr>
-      <button id="previewBtn">🔍 Preview Client Dashboard</button>
-      <button id="clearBtn">🧹 Clear Plan</button>
-      <button id="undoBtn">↩️ Undo Last Change</button>
+
+      <h3>Assign Workouts by Day</h3>
+      <label for="workoutDay">Day:</label>
+      <select id="workoutDay">
+        <option value="Monday">Monday</option>
+        <option value="Tuesday">Tuesday</option>
+        <option value="Wednesday">Wednesday</option>
+        <option value="Thursday">Thursday</option>
+        <option value="Friday">Friday</option>
+        <option value="Saturday">Saturday</option>
+        <option value="Sunday">Sunday</option>
+      </select>
+      <div id="exerciseList"></div>
+      <button id="addWorkoutBtn">+ Add Exercise</button>
+
+      <h3>Assign Meal Plan</h3>
+      <div id="mealList"></div>
+      <button id="addMealBtn">+ Add Meal</button>
+      <p><strong>Total:</strong> <span id="dailyTotal">Calories: 0 | Protein: 0g | Carbs: 0g | Fats: 0g</span></p>
+
+      <button id="previewBtn">🔍 Preview</button>
     </section>
   </div>
 
@@ -138,215 +95,243 @@
     const loginDiv = document.getElementById('login');
     const sidebar = document.querySelector('.sidebar');
     const mainContent = document.querySelector('.main-content');
-    const clientNameSpan = document.getElementById('clientName');
     const signInBtn = document.getElementById('signInBtn');
     const signUpBtn = document.getElementById('signUpBtn');
     const signOutLink = document.getElementById('signOutLink');
     const adminPanelLink = document.getElementById('adminPanelLink');
     const clientSelect = document.getElementById('clientSelect');
-
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        const userEmail = user.email;
-        loginDiv.style.display = 'none';
-        sidebar.style.display = 'block';
-        mainContent.style.display = 'block';
-        clientNameSpan.textContent = userEmail.split('@')[0];
-
-        adminPanelLink.style.display = 'none';
-        document.getElementById('admin-panel').style.display = 'none';
-
-        if (userEmail === 'jeremyevega@icloud.com') {
-          adminPanelLink.style.display = 'block';
-          document.getElementById('admin-panel').style.display = 'block';
-
-          db.collection('clients').get().then(snapshot => {
-            snapshot.forEach(doc => {
-              const opt = document.createElement('option');
-              opt.value = doc.id;
-              opt.textContent = doc.data().email;
-              clientSelect.appendChild(opt);
-            });
-          });
-        }
-      } else {
-        loginDiv.style.display = 'block';
-        sidebar.style.display = 'none';
-        mainContent.style.display = 'none';
-      }
-    });
-
-    signInBtn.addEventListener('click', () => {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      auth.signInWithEmailAndPassword(email, password).catch(err => alert(err.message));
-    });
-
-    signUpBtn.addEventListener('click', () => {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(cred => {
-          return db.collection('clients').doc(cred.user.uid).set({
-            email: cred.user.email,
-            meals: [],
-            workout: [],
-            trainerNote: "Welcome to your program! Let’s get to work!"
-          });
-        })
-        .catch(err => alert(err.message));
-    });
-
-    signOutLink.addEventListener('click', e => {
-      e.preventDefault();
-      auth.signOut();
-    });
-
-    document.querySelectorAll('nav ul li a').forEach(link => {
-      if (link.id === 'signOutLink') return;
-      link.addEventListener('click', e => {
-        e.preventDefault();
-        document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
-        const id = link.getAttribute('href').substring(1);
-        document.getElementById(id).style.display = 'block';
-      });
-    });
-
-    document.getElementById('previewBtn').addEventListener('click', () => {
-      const clientId = clientSelect.value;
-      if (!clientId) return alert('Please select a client first.');
-      window.open(`preview.html?id=${clientId}`, '_blank');
-    });
+    const clientNameSpan = document.getElementById('clientName');
+    const workoutOutput = document.getElementById('clientWorkoutOutput');
+    const mealOutput = document.getElementById('clientMealOutput');
+    const macroTotal = document.getElementById('clientMacroTotal');
 
     const exerciseList = document.getElementById('exerciseList');
     const addWorkoutBtn = document.getElementById('addWorkoutBtn');
+    const mealList = document.getElementById('mealList');
+    const addMealBtn = document.getElementById('addMealBtn');
+    const workoutDay = document.getElementById('workoutDay');
+    const dailyTotal = document.getElementById('dailyTotal');
 
-    function createExerciseInputs(data = {}) {
-      const container = document.createElement('div');
-      container.style.marginBottom = '20px';
+    let currentUserId = null;
 
-      const name = document.createElement('input');
-      name.placeholder = 'Exercise name';
-      name.value = data.name || '';
+    auth.onAuthStateChanged(user => {
+      if (!user) return location.reload();
+      currentUserId = user.uid;
+      loginDiv.style.display = 'none';
+      sidebar.style.display = 'block';
+      mainContent.style.display = 'block';
+      clientNameSpan.textContent = user.email.split('@')[0];
 
-      const setsReps = document.createElement('input');
-      setsReps.placeholder = 'Sets x Reps';
-      setsReps.value = data.setsReps || '';
-
-      const weight = document.createElement('input');
-      weight.placeholder = 'Weight';
-      weight.value = data.weight || '';
-
-      const rest = document.createElement('input');
-      rest.placeholder = 'Rest time';
-      rest.value = data.rest || '';
-
-      const link = document.createElement('input');
-      link.placeholder = 'Video link';
-      link.value = data.link || '';
-
-      [name, setsReps, weight, rest, link].forEach(input => {
-        input.style.display = 'block';
-        input.style.marginBottom = '5px';
-        input.addEventListener('input', () => saveWorkoutData());
-        container.appendChild(input);
-      });
-
-      exerciseList.appendChild(container);
-    }
-
-    addWorkoutBtn.addEventListener('click', () => {
-      createExerciseInputs();
-      saveWorkoutData();
+      if (user.email === 'jeremyevega@icloud.com') {
+        adminPanelLink.style.display = 'block';
+        document.getElementById('admin-panel').style.display = 'block';
+        db.collection('clients').get().then(snapshot => {
+          snapshot.forEach(doc => {
+            const opt = document.createElement('option');
+            opt.value = doc.id;
+            opt.textContent = doc.data().email;
+            clientSelect.appendChild(opt);
+          });
+        });
+      } else {
+        db.collection('clients').doc(currentUserId).get().then(doc => {
+          const data = doc.data();
+          displayClientWorkout(data.workout);
+          displayClientMeals(data.meals);
+        });
+      }
     });
 
-    function saveWorkoutData() {
+    function displayClientWorkout(workout = []) {
+      const days = {};
+      workoutOutput.innerHTML = '';
+      workout.forEach(item => {
+        if (!days[item.day]) days[item.day] = [];
+        days[item.day].push(item);
+      });
+      for (const day in days) {
+        const block = document.createElement('div');
+        block.innerHTML = `<h3>${day}</h3>`;
+        days[day].forEach(ex => {
+          block.innerHTML += `<p><strong>${ex.name}</strong> — ${ex.setsReps}, ${ex.weight}, ${ex.rest}</p>`;
+        });
+        workoutOutput.appendChild(block);
+      }
+    }
+
+    function displayClientMeals(meals = []) {
+      mealOutput.innerHTML = '';
+      let cal = 0, p = 0, c = 0, f = 0;
+      meals.forEach(meal => {
+        cal += meal.calories || 0;
+        p += meal.protein || 0;
+        c += meal.carbs || 0;
+        f += meal.fats || 0;
+        mealOutput.innerHTML += `<p><strong>${meal.name}</strong> — ${meal.calories} cal, P:${meal.protein}g C:${meal.carbs}g F:${meal.fats}g</p>`;
+      });
+      macroTotal.textContent = `Total: ${cal} cal | Protein: ${p}g | Carbs: ${c}g | Fats: ${f}g`;
+    }
+
+    signInBtn.onclick = () => {
+      auth.signInWithEmailAndPassword(
+        document.getElementById('email').value,
+        document.getElementById('password').value
+      ).catch(e => alert(e.message));
+    };
+
+    signUpBtn.onclick = () => {
+      auth.createUserWithEmailAndPassword(
+        document.getElementById('email').value,
+        document.getElementById('password').value
+      ).then(cred => {
+        return db.collection('clients').doc(cred.user.uid).set({
+          email: cred.user.email,
+          workout: [],
+          meals: []
+        });
+      }).catch(e => alert(e.message));
+    };
+
+    signOutLink.onclick = () => auth.signOut();
+
+    addWorkoutBtn.onclick = () => {
+      const container = document.createElement('div');
+      const name = document.createElement('input');
+      const setsReps = document.createElement('input');
+      const weight = document.createElement('input');
+      const rest = document.createElement('input');
+
+      name.placeholder = 'Name';
+      setsReps.placeholder = 'Sets x Reps';
+      weight.placeholder = 'Weight';
+      rest.placeholder = 'Rest';
+
+      [name, setsReps, weight, rest].forEach(el => {
+        el.style.display = 'block';
+        el.addEventListener('input', saveWorkouts);
+        container.appendChild(el);
+      });
+      container.dataset.day = workoutDay.value;
+      exerciseList.appendChild(container);
+      saveWorkouts();
+    };
+
+    function saveWorkouts() {
       const clientId = clientSelect.value;
       if (!clientId) return;
-
-      const exercises = [];
-      const blocks = exerciseList.querySelectorAll('div');
-
-      blocks.forEach(block => {
-        const inputs = block.querySelectorAll('input');
-        exercises.push({
+      const all = exerciseList.querySelectorAll('div');
+      const arr = Array.from(all).map(div => {
+        const inputs = div.querySelectorAll('input');
+        return {
+          day: div.dataset.day,
           name: inputs[0].value,
           setsReps: inputs[1].value,
           weight: inputs[2].value,
-          rest: inputs[3].value,
-          link: inputs[4].value
-        });
+          rest: inputs[3].value
+        };
       });
-
-      db.collection('clients').doc(clientId).update({ workout: exercises });
+      db.collection('clients').doc(clientId).update({ workout: arr });
     }
 
-    const mealList = document.getElementById('mealList');
-    const addMealBtn = document.getElementById('addMealBtn');
-    const dailyTotal = document.getElementById('dailyTotal');
-
-    addMealBtn.addEventListener('click', () => {
-      const meal = document.createElement('div');
-
+    addMealBtn.onclick = () => {
+      const container = document.createElement('div');
       const name = document.createElement('input');
-      name.placeholder = 'Meal name';
-
       const cal = document.createElement('input');
+      const p = document.createElement('input');
+      const c = document.createElement('input');
+      const f = document.createElement('input');
+      name.placeholder = 'Meal';
       cal.placeholder = 'Calories';
-
-      const protein = document.createElement('input');
-      protein.placeholder = 'Protein (g)';
-
-      const carbs = document.createElement('input');
-      carbs.placeholder = 'Carbs (g)';
-
-      const fats = document.createElement('input');
-      fats.placeholder = 'Fats (g)';
-
-      [name, cal, protein, carbs, fats].forEach(input => {
+      p.placeholder = 'Protein';
+      c.placeholder = 'Carbs';
+      f.placeholder = 'Fats';
+      [name, cal, p, c, f].forEach(input => {
         input.style.display = 'block';
-        input.style.marginBottom = '5px';
-        input.addEventListener('input', saveMealData);
-        meal.appendChild(input);
+        input.addEventListener('input', saveMeals);
+        container.appendChild(input);
       });
+      mealList.appendChild(container);
+      saveMeals();
+    };
 
-      mealList.appendChild(meal);
-      saveMealData();
-    });
-
-    function saveMealData() {
+    function saveMeals() {
       const clientId = clientSelect.value;
       if (!clientId) return;
-
-      const meals = [];
-      let totalCals = 0, totalProtein = 0, totalCarbs = 0, totalFats = 0;
-
       const blocks = mealList.querySelectorAll('div');
-
-      blocks.forEach(block => {
-        const inputs = block.querySelectorAll('input');
-        const cals = parseInt(inputs[1].value) || 0;
-        const prot = parseInt(inputs[2].value) || 0;
-        const crbs = parseInt(inputs[3].value) || 0;
-        const fat = parseInt(inputs[4].value) || 0;
-
-        meals.push({
-          name: inputs[0].value,
-          calories: cals,
-          protein: prot,
-          carbs: crbs,
-          fats: fat
-        });
-
-        totalCals += cals;
-        totalProtein += prot;
-        totalCarbs += crbs;
-        totalFats += fat;
+      const meals = [], totals = { cal: 0, p: 0, c: 0, f: 0 };
+      blocks.forEach(div => {
+        const i = div.querySelectorAll('input');
+        const meal = {
+          name: i[0].value,
+          calories: parseInt(i[1].value) || 0,
+          protein: parseInt(i[2].value) || 0,
+          carbs: parseInt(i[3].value) || 0,
+          fats: parseInt(i[4].value) || 0
+        };
+        totals.cal += meal.calories;
+        totals.p += meal.protein;
+        totals.c += meal.carbs;
+        totals.f += meal.fats;
+        meals.push(meal);
       });
-
-      dailyTotal.textContent = `Calories: ${totalCals} | Protein: ${totalProtein}g | Carbs: ${totalCarbs}g | Fats: ${totalFats}g`;
+      dailyTotal.textContent = `Calories: ${totals.cal} | Protein: ${totals.p}g | Carbs: ${totals.c}g | Fats: ${totals.f}g`;
       db.collection('clients').doc(clientId).update({ meals });
     }
+
+    clientSelect.onchange = () => {
+      const id = clientSelect.value;
+      if (!id) return;
+      db.collection('clients').doc(id).get().then(doc => {
+        const data = doc.data();
+        exerciseList.innerHTML = '';
+        data.workout?.forEach(ex => {
+          const container = document.createElement('div');
+          container.dataset.day = ex.day || 'Unassigned';
+          const name = document.createElement('input');
+          name.value = ex.name || '';
+          const setsReps = document.createElement('input');
+          setsReps.value = ex.setsReps || '';
+          const weight = document.createElement('input');
+          weight.value = ex.weight || '';
+          const rest = document.createElement('input');
+          rest.value = ex.rest || '';
+          [name, setsReps, weight, rest].forEach(input => {
+            input.style.display = 'block';
+            input.addEventListener('input', saveWorkouts);
+            container.appendChild(input);
+          });
+          exerciseList.appendChild(container);
+        });
+        mealList.innerHTML = '';
+        data.meals?.forEach(meal => {
+          const container = document.createElement('div');
+          const name = document.createElement('input');
+          name.value = meal.name || '';
+          const cal = document.createElement('input');
+          cal.value = meal.calories || 0;
+          const p = document.createElement('input');
+          p.value = meal.protein || 0;
+          const c = document.createElement('input');
+          c.value = meal.carbs || 0;
+          const f = document.createElement('input');
+          f.value = meal.fats || 0;
+          [name, cal, p, c, f].forEach(input => {
+            input.style.display = 'block';
+            input.addEventListener('input', saveMeals);
+            container.appendChild(input);
+          });
+          mealList.appendChild(container);
+        });
+        saveWorkouts();
+        saveMeals();
+      });
+    };
+
+    document.getElementById('previewBtn').onclick = () => {
+      const clientId = clientSelect.value;
+      if (!clientId) return alert('Select a client first');
+      window.open(`preview.html?id=${clientId}`, '_blank');
+    };
   </script>
 </body>
 </html>
