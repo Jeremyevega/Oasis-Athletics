@@ -117,7 +117,6 @@
       <div id="clientNotesOutput">Loading client notes...</div>
       <hr>
       <button id="previewBtn">🔍 Preview Client Dashboard</button>
-      <button id="clearBtn">🧹 Clear Plan</button>
       <button id="undoBtn">↩️ Undo Last Change</button>
     </section>
   </div>
@@ -300,132 +299,191 @@
     const exerciseList = document.getElementById('exerciseList');
     const addWorkoutBtn = document.getElementById('addWorkoutBtn');
 
-    function createExerciseInputs(data = {}) {
-      const container = document.createElement('div');
-      container.style.marginBottom = '20px';
+   function createExerciseInputs(data = {}) {
+  const container = document.createElement('div');
+  container.classList.add('exercise-block');
+  container.style.marginBottom = '20px';
 
-      const name = document.createElement('input');
-      name.placeholder = 'Exercise name';
-      name.value = data.name || '';
+  // Day selector for this exercise
+  const daySelect = document.createElement('select');
+  ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+    .forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d;
+      opt.textContent = d;
+      if (data.day === d) opt.selected = true;
+      daySelect.appendChild(opt);
+    });
+  container.appendChild(daySelect);
 
-      const setsReps = document.createElement('input');
-      setsReps.placeholder = 'Sets x Reps';
-      setsReps.value = data.setsReps || '';
+  // Exercise Name
+  const nameInput = document.createElement('input');
+  nameInput.placeholder = 'Exercise name';
+  nameInput.value = data.name || '';
+  container.appendChild(nameInput);
 
-      const weight = document.createElement('input');
-      weight.placeholder = 'Weight';
-      weight.value = data.weight || '';
+  // Sets x Reps
+  const setsRepsInput = document.createElement('input');
+  setsRepsInput.placeholder = 'Sets x Reps';
+  setsRepsInput.value = data.setsReps || '';
+  container.appendChild(setsRepsInput);
 
-      const rest = document.createElement('input');
-      rest.placeholder = 'Rest time';
-      rest.value = data.rest || '';
+  // Weight
+  const weightInput = document.createElement('input');
+  weightInput.placeholder = 'Weight';
+  weightInput.value = data.weight || '';
+  container.appendChild(weightInput);
 
-      const link = document.createElement('input');
-      link.placeholder = 'Video link';
-      link.value = data.link || '';
+  // Rest Time
+  const restInput = document.createElement('input');
+  restInput.placeholder = 'Rest Time';
+  restInput.value = data.rest || '';
+  container.appendChild(restInput);
 
-      [name, setsReps, weight, rest, link].forEach(input => {
-        input.style.display = 'block';
-        input.style.marginBottom = '5px';
-        input.addEventListener('input', () => saveWorkoutData());
-        container.appendChild(input);
-      });
+  // Demo link (URL)
+  const linkInput = document.createElement('input');
+  linkInput.placeholder = 'Demo link (URL)';
+  linkInput.value = data.link || '';
+  container.appendChild(linkInput);
 
-      exerciseList.appendChild(container);
-    }
+  // Delete this single exercise
+  const delBtn = document.createElement('button');
+  delBtn.type = 'button';
+  delBtn.textContent = 'Delete Exercise';
+  delBtn.addEventListener('click', () => {
+    container.remove();
+    saveWorkoutData();
+  });
+  container.appendChild(delBtn);
+
+  exerciseList.appendChild(container);
+}
 
     addWorkoutBtn.addEventListener('click', () => {
       createExerciseInputs();
       saveWorkoutData();
     });
 
-    function saveWorkoutData() {
-      const clientId = clientSelect.value;
-      if (!clientId) return;
+function saveWorkoutData() {
+  const clientId = clientSelect.value;
+  if (!clientId) return;
 
-      const exercises = [];
-      const blocks = exerciseList.querySelectorAll('div');
+  const exercises = [];
+  const blocks = exerciseList.querySelectorAll('.exercise-block');
 
-      blocks.forEach(block => {
-        const inputs = block.querySelectorAll('input');
-        exercises.push({
-          name: inputs[0].value,
-          setsReps: inputs[1].value,
-          weight: inputs[2].value,
-          rest: inputs[3].value,
-          link: inputs[4].value
-        });
-      });
+  blocks.forEach(block => {
+    const day = block.querySelector('select').value;
+    const inputs = block.querySelectorAll('input');
+    exercises.push({
+      day:      day,
+      name:     inputs[0].value,
+      setsReps: inputs[1].value,
+      weight:   inputs[2].value,
+      rest:     inputs[3].value,
+      link:     inputs[4].value
+    });
+  });
 
-      db.collection('clients').doc(clientId).update({ workout: exercises });
-    }
+  db.collection('clients').doc(clientId).update({ workout: exercises });
+}
 
     const mealList = document.getElementById('mealList');
     const addMealBtn = document.getElementById('addMealBtn');
     const dailyTotal = document.getElementById('dailyTotal');
 
     addMealBtn.addEventListener('click', () => {
-      const meal = document.createElement('div');
+  const meal = document.createElement('div');
+  meal.classList.add('meal-block');
 
-      const name = document.createElement('input');
-      name.placeholder = 'Meal name';
+  // Day selector for this meal
+  const mealDay = document.createElement('select');
+  ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+    .forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d;
+      opt.textContent = d;
+      mealDay.appendChild(opt);
+    });
+  meal.appendChild(mealDay);
 
-      const cal = document.createElement('input');
-      cal.placeholder = 'Calories';
+  // Meal Name
+  const nameInput = document.createElement('input');
+  nameInput.placeholder = 'Meal name';
+  meal.appendChild(nameInput);
 
-      const protein = document.createElement('input');
-      protein.placeholder = 'Protein (g)';
+  // Calories
+  const calInput = document.createElement('input');
+  calInput.placeholder = 'Calories';
+  meal.appendChild(calInput);
 
-      const carbs = document.createElement('input');
-      carbs.placeholder = 'Carbs (g)';
+  // Protein
+  const proteinInput = document.createElement('input');
+  proteinInput.placeholder = 'Protein';
+  meal.appendChild(proteinInput);
 
-      const fats = document.createElement('input');
-      fats.placeholder = 'Fats (g)';
+  // Carbs
+  const carbsInput = document.createElement('input');
+  carbsInput.placeholder = 'Carbs';
+  meal.appendChild(carbsInput);
 
-      [name, cal, protein, carbs, fats].forEach(input => {
-        input.style.display = 'block';
-        input.style.marginBottom = '5px';
-        input.addEventListener('input', saveMealData);
-        meal.appendChild(input);
-      });
+  // Fats
+  const fatsInput = document.createElement('input');
+  fatsInput.placeholder = 'Fats';
+  meal.appendChild(fatsInput);
+
+  // Delete this single meal
+  const delMealBtn = document.createElement('button');
+  delMealBtn.type = 'button';
+  delMealBtn.textContent = 'Delete Meal';
+  delMealBtn.addEventListener('click', () => {
+    meal.remove();
+    saveMealData();
+  });
+  meal.appendChild(delMealBtn);
+
+  mealList.appendChild(meal);
+});
 
       mealList.appendChild(meal);
       saveMealData();
     });
 
     function saveMealData() {
-      const clientId = clientSelect.value;
-      if (!clientId) return;
+  const clientId = clientSelect.value;
+  if (!clientId) return;
 
-      const meals = [];
-      let totalCals = 0, totalProtein = 0, totalCarbs = 0, totalFats = 0;
+  const meals = [];
+  let totalCals = 0, totalProtein = 0, totalCarbs = 0, totalFats = 0;
+  const blocks = mealList.querySelectorAll('.meal-block');
 
-      const blocks = mealList.querySelectorAll('div');
+  blocks.forEach(block => {
+    const day = block.querySelector('select').value;
+    const inputs = block.querySelectorAll('input');
+    const cals = parseInt(inputs[1].value) || 0;
+    const prot = parseInt(inputs[2].value) || 0;
+    const crbs = parseInt(inputs[3].value) || 0;
+    const fat  = parseInt(inputs[4].value) || 0;
 
-      blocks.forEach(block => {
-        const inputs = block.querySelectorAll('input');
-        const cals = parseInt(inputs[1].value) || 0;
-        const prot = parseInt(inputs[2].value) || 0;
-        const crbs = parseInt(inputs[3].value) || 0;
-        const fat = parseInt(inputs[4].value) || 0;
+    meals.push({
+      day:      day,
+      name:     inputs[0].value,
+      calories: cals,
+      protein:  prot,
+      carbs:    crbs,
+      fats:     fat
+    });
 
-        meals.push({
-          name: inputs[0].value,
-          calories: cals,
-          protein: prot,
-          carbs: crbs,
-          fats: fat
-        });
+    totalCals     += cals;
+    totalProtein += prot;
+    totalCarbs   += crbs;
+    totalFats    += fat;
+  });
 
-        totalCals += cals;
-        totalProtein += prot;
-        totalCarbs += crbs;
-        totalFats += fat;
-      });
+  dailyTotal.textContent =
+    `Calories: ${totalCals} | Protein: ${totalProtein}g | Carbs: ${totalCarbs}g | Fats: ${totalFats}g`;
 
-      dailyTotal.textContent = `Calories: ${totalCals} | Protein: ${totalProtein}g | Carbs: ${totalCarbs}g | Fats: ${totalFats}g`;
-      db.collection('clients').doc(clientId).update({ meals });
-    }
+  db.collection('clients').doc(clientId).update({ meals });
+}
   </script>
 </body>
 </html>
