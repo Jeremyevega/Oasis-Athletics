@@ -138,7 +138,7 @@
     const addMealBtn     = document.getElementById('addMealBtn');
     const dailyTotal     = document.getElementById('dailyTotal');
 
-    // Authentication state change
+    // Auth state
     auth.onAuthStateChanged(user => {
       if (user) {
         loginDiv.style.display    = 'none';
@@ -186,12 +186,11 @@
             });
           });
         } else {
-          // Regular client view
+          // Client view
           ['dashboard','workout','nutrition','progress','notes','contact'].forEach(id =>
             document.getElementById(id).style.display = id === 'dashboard' ? 'block' : 'none'
           );
-          const clientId = user.uid;
-          db.collection('clients').doc(clientId).get().then(doc => {
+          db.collection('clients').doc(user.uid).get().then(doc => {
             const data = doc.data();
             const workoutUl = document.querySelector('#workout .workout-day ul');
             workoutUl.innerHTML = '';
@@ -224,7 +223,7 @@
       }
     });
 
-    // Sign in/up/out handlers
+    // Sign in/up/out
     signInBtn.addEventListener('click', () => {
       auth.signInWithEmailAndPassword(
         document.getElementById('email').value,
@@ -254,13 +253,12 @@
       if (link.id === 'signOutLink') return;
       link.addEventListener('click', e => {
         e.preventDefault();
-        const target = link.getAttribute('href').slice(1);
         document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
-        document.getElementById(target).style.display = 'block';
+        document.getElementById(link.getAttribute('href').slice(1)).style.display = 'block';
       });
     });
 
-    // Preview client dashboard
+    // Preview
     document.getElementById('previewBtn').addEventListener('click', () => {
       const clientId = clientSelect.value;
       if (!clientId) return alert('Select a client.');
@@ -276,9 +274,7 @@
       const c = document.createElement('div');
       c.classList.add('exercise-block');
       ['day','name','setsReps','weight','rest','link'].forEach((key, i) => {
-        const el = i === 0
-          ? document.createElement('select')
-          : document.createElement('input');
+        const el = i === 0 ? document.createElement('select') : document.createElement('input');
         if (i === 0) {
           ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d => {
             const o = document.createElement('option');
@@ -286,9 +282,11 @@
             if (data.day === d) o.selected = true;
             el.appendChild(o);
           });
+          el.addEventListener('change', saveWorkoutData);
         } else {
           el.placeholder = key;
           el.value = data[key] || '';
+          el.addEventListener('input', saveWorkoutData);
         }
         c.appendChild(el);
       });
@@ -318,17 +316,17 @@
       const m = document.createElement('div');
       m.classList.add('meal-block');
       ['day','name','calories','protein','carbs','fats'].forEach((key, i) => {
-        const el = i === 0
-          ? document.createElement('select')
-          : document.createElement('input');
+        const el = i === 0 ? document.createElement('select') : document.createElement('input');
         if (i === 0) {
           ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d => {
             const o = document.createElement('option');
             o.value = d; o.textContent = d;
             el.appendChild(o);
           });
+          el.addEventListener('change', saveMealData);
         } else {
           el.placeholder = key;
+          el.addEventListener('input', saveMealData);
         }
         m.appendChild(el);
       });
@@ -352,12 +350,16 @@
         const vals = Array.from(b.querySelectorAll('select, input')).map(i => i.value);
         const nums = vals.slice(2).map(x => parseInt(x) || 0);
         nums.forEach((n, i) => sums[i] += n);
-        arr.push({ day: vals[0], name: vals[1],
-          calories: nums[0], protein: nums[1], carbs: nums[2], fats: nums[3]
+        arr.push({
+          day: vals[0],
+          name: vals[1],
+          calories: nums[0],
+          protein: nums[1],
+          carbs: nums[2],
+          fats: nums[3]
         });
       });
-      dailyTotal.textContent =
-        `Cal: ${sums[0]} | P: ${sums[1]}g | C: ${sums[2]}g | F: ${sums[3]}g`;
+      dailyTotal.textContent = `Cal: ${sums[0]} | P: ${sums[1]}g | C: ${sums[2]}g | F: ${sums[3]}g`;
       db.collection('clients').doc(id).update({ meals: arr });
     }
   </script>
