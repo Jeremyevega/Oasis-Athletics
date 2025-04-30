@@ -1,170 +1,133 @@
-/* Base resets and font */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
 body {
   font-family: 'Poppins', sans-serif;
-  background-color: #fafafa;
-  color: #333;
-  line-height: 1.6;
+  background-color: #1a1a1a;
+  color: #fff;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #111;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.logo-placeholder {
+  color: #fff;
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+nav ul li {
+  margin-bottom: 15px;
+}
+
+nav ul li a {
+  color: #ddd;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+nav ul li a:hover {
+  color: #fff;
+}
+
+.main-content {
+  margin-left: 270px;
+  padding: 20px;
+}
+
+h1, h2, h3 {
+  color: #fff;
+}
+
+textarea, input[type="text"], input[type="email"], input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+}
+
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #0077cc;
+  color: white;
+  cursor: pointer;
+  margin: 5px 0;
+}
+
+button:hover {
+  background-color: #005fa3;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+section {
+  margin-bottom: 40px;
+  display: none;
+}
+
+section:first-of-type {
+  display: block;
+}
+
+.meal-plan, .workout-day {
+  margin-bottom: 20px;
 }
 
 a {
-  color: #2a7de1;
-  text-decoration: none;
+  color: #1e90ff;
 }
+
 a:hover {
   text-decoration: underline;
 }
 
-/* Layout */
-.sidebar {
-  width: 220px;
-  background-color: #ffffff;
-  border-right: 1px solid #e0e0e0;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  padding: 20px;
-}
-.main-content {
-  margin-left: 240px;
-  padding: 30px;
-}
-
-/* Sidebar nav */
-.sidebar .logo-placeholder {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-.sidebar nav ul {
-  list-style: none;
-}
-.sidebar nav ul li {
-  margin-bottom: 12px;
-}
-.sidebar nav ul li a {
-  display: block;
-  padding: 8px 12px;
-  border-radius: 4px;
-  transition: background 0.2s;
-}
-.sidebar nav ul li a:hover {
-  background-color: #f0f8ff;
-}
-
-/* Login form */
 #login {
-  max-width: 320px;
-  margin: 100px auto;
-  padding: 24px;
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  margin: 50px auto;
+  max-width: 400px;
+  padding: 20px;
+  background-color: #222;
+  border-radius: 10px;
+  display: none;
+}
+
+#login h2 {
   text-align: center;
 }
-#login input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-#login button {
-  width: 48%;
-  padding: 10px;
-  margin: 0 2%;
-  border: none;
-  border-radius: 4px;
-  background-color: #2a7de1;
-  color: #fff;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-#login button:hover {
-  background-color: #1f5bb5;
+
+#clientNotesOutput, #mealsList, #workoutEditor {
+  margin-bottom: 20px;
 }
 
-/* Sections */
-section {
-  margin-bottom: 40px;
-}
-h2 {
-  margin-bottom: 16px;
-  font-size: 1.375rem;
-  color: #2a7de1;
+/* Preview-specific fallback for visibility */
+body.preview-page {
+  background-color: #f4f4f4;
+  color: #111;
 }
 
-/* Table styling (Workout Plan) */
-#workoutTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 16px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-#workoutTable th,
-#workoutTable td {
-  padding: 12px 8px;
-  text-align: left;
-  border-bottom: 1px solid #e0e0e0;
-}
-#workoutTable thead {
-  background-color: #2a7de1;
-  color: #fff;
-}
-#workoutTable tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-#workoutTable a {
-  color: #2a7de1;
-  font-weight: 500;
-}
-
-/* Inputs & Buttons in Admin Editor */
-#workoutEditor input,
-#mealEditor input,
-#workoutEditor select,
-#mealEditor select,
-#trainerNote {
-  display: block;
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-#workoutEditor button,
-#mealEditor button {
-  background-color: #2a7de1;
-  color: #fff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-#workoutEditor button:hover,
-#mealEditor button:hover {
-  background-color: #1f5bb5;
-}
-
-/* Meal plan cards */
-.meal-plan {
+body.preview-page .main-content {
   background-color: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  padding: 16px;
-  margin-bottom: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .sidebar { display: none; }
-  .main-content { margin: 0; }
+  margin: auto;
+  max-width: 800px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
