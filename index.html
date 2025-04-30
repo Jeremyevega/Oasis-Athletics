@@ -51,7 +51,6 @@
 
     <section id="nutrition" style="display:none;">
       <h2>Nutrition</h2>
-      <!-- client-side meal plans will appear here -->
     </section>
 
     <section id="progress" style="display:none;">
@@ -169,10 +168,8 @@
             if (!clientId) return;
             db.collection('clients').doc(clientId).get().then(doc => {
               const data = doc.data();
-              // Populate workout editor
               exerciseList.innerHTML = '';
               (data.workout || []).forEach(w => createExerciseInputs(w));
-              // Populate meal editor
               mealList.innerHTML = '';
               (data.meals || []).forEach(m => {
                 const div = document.createElement('div');
@@ -196,7 +193,6 @@
           const clientId = user.uid;
           db.collection('clients').doc(clientId).get().then(doc => {
             const data = doc.data();
-            // Render workouts
             const workoutUl = document.querySelector('#workout .workout-day ul');
             workoutUl.innerHTML = '';
             (data.workout || []).forEach(ex => {
@@ -209,7 +205,6 @@
                 <a href="${ex.link}" target="_blank">Demo</a>`;
               workoutUl.appendChild(li);
             });
-            // Render meals
             const nutritionSection = document.getElementById('nutrition');
             nutritionSection.innerHTML = '<h2>Nutrition</h2>';
             (data.meals || []).forEach(meal => {
@@ -223,7 +218,6 @@
           });
         }
       } else {
-        // Signed out
         loginDiv.style.display    = 'block';
         sidebar.style.display     = 'none';
         mainContent.style.display = 'none';
