@@ -440,6 +440,47 @@ function saveWorkoutData() {
     saveMealData();
   });
   meal.appendChild(delMealBtn);
+
+  mealList.appendChild(meal);
+  saveMealData();
+});
+
+  meal.appendChild(mealDay);
+
+  // Meal Name
+  const nameInput = document.createElement('input');
+  nameInput.placeholder = 'Meal name';
+  meal.appendChild(nameInput);
+
+  // Calories
+  const calInput = document.createElement('input');
+  calInput.placeholder = 'Calories';
+  meal.appendChild(calInput);
+
+  // Protein
+  const proteinInput = document.createElement('input');
+  proteinInput.placeholder = 'Protein';
+  meal.appendChild(proteinInput);
+
+  // Carbs
+  const carbsInput = document.createElement('input');
+  carbsInput.placeholder = 'Carbs';
+  meal.appendChild(carbsInput);
+
+  // Fats
+  const fatsInput = document.createElement('input');
+  fatsInput.placeholder = 'Fats';
+  meal.appendChild(fatsInput);
+
+  // Delete this single meal
+  const delMealBtn = document.createElement('button');
+  delMealBtn.type = 'button';
+  delMealBtn.textContent = 'Delete Meal';
+  delMealBtn.addEventListener('click', () => {
+    meal.remove();
+    saveMealData();
+  });
+  meal.appendChild(delMealBtn);
       
       mealList.appendChild(meal);
     });
