@@ -167,8 +167,87 @@
               opt.textContent = doc.data().email;
               clientSelect.appendChild(opt);
             });
-          });
-        }
+          });  // ——— When admin picks a client, load their saved data into the editors ———
+  clientSelect.addEventListener('change', () => {
+    const clientId = clientSelect.value;
+    if (!clientId) return;
+    db.collection('clients').doc(clientId).get().then(doc => {
+      if (!doc.exists) return;
+      const data = doc.data();
+
+      // Workout editor
+      exerciseList.innerHTML = '';
+      (data.workout || []).forEach(w => createExerciseInputs(w));
+
+      // Meal editor
+      mealList.innerHTML = '';
+      (data.meals || []).forEach(m => {
+        const mealDiv        = document.createElement('div');
+        const nameInput      = document.createElement('input');
+        const caloriesInput  = document.createElement('input');
+        const proteinInput   = document.createElement('input');
+        const carbsInput     = document.createElement('input');
+        const fatsInput      = document.createElement('input');
+
+        nameInput.placeholder     = 'Meal name';    nameInput.value     = m.name     || '';
+        caloriesInput.placeholder = 'Calories';     caloriesInput.value = m.calories|| '';
+        proteinInput.placeholder  = 'Protein';      proteinInput.value  = m.protein || '';
+        carbsInput.placeholder    = 'Carbs';        carbsInput.value    = m.carbs   || '';
+        fatsInput.placeholder     = 'Fats';         fatsInput.value     = m.fats    || '';
+
+        [nameInput, caloriesInput, proteinInput, carbsInput, fatsInput].forEach(input => {
+          input.style.display      = 'block';
+          input.style.marginBottom = '5px';
+          input.addEventListener('input', saveMealData);
+          mealDiv.appendChild(input);
+        });
+
+        mealList.appendChild(mealDiv);
+      });
+
+      // Trainer note
+      document.getElementById('trainerNote').value = data.trainerNote || '';
+    });
+  });
+
+        }  // ——— If a regular (non-admin) client has just signed in, fetch & display their plan ———
+  if (userEmail !== 'jeremyevega@icloud.com') {
+    const clientId = user.uid;
+    db.collection('clients').doc(clientId).get().then(doc => {
+      if (!doc.exists) return;
+      const data = doc.data();
+
+      // Workout section
+      const workoutList = document.querySelector('#workout .workout-day ul');
+      workoutList.innerHTML = '';
+      (data.workout || []).forEach(ex => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <strong>Exercise:</strong> ${ex.name}<br>
+          <strong>Sets/Reps:</strong> ${ex.setsReps}<br>
+          <strong>Starting Weight:</strong> ${ex.weight} lbs<br>
+          <strong>Rest Time:</strong> ${ex.rest} seconds<br>
+          <a href="${ex.link}" target="_blank">View Demo</a>
+        `;
+        workoutList.appendChild(li);
+      });
+
+      // Nutrition section
+      const nutritionSection = document.getElementById('nutrition');
+      nutritionSection.querySelectorAll('.meal-plan').forEach(el => el.remove());
+      (data.meals || []).forEach(meal => {
+        const div = document.createElement('div');
+        div.classList.add('meal-plan');
+        div.innerHTML = `
+          <h3>${meal.name}</h3>
+          <p>${meal.name} – ${meal.calories} calories</p>
+          <p>Protein: ${meal.protein}g, Carbs: ${meal.carbs}g, Fat: ${meal.fats}g</p>
+        `;
+        nutritionSection.appendChild(div);
+      });
+    });
+  }
+
       } else {
         loginDiv.style.display = 'block';
         sidebar.style.display = 'none';
